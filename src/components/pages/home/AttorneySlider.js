@@ -12,12 +12,6 @@ const SliderDiv = styled.div`
   width: 100%;
   overflow: hidden;
   padding: 40px 0;
-
-  div.slick-slider {
-    width: 100%;
-    height: 100%;
-    max-height: 600px;
-  }
 `;
 
 const SliderItem = styled.div`

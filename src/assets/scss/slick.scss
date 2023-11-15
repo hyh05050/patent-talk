@@ -105,3 +105,34 @@
 .slick-arrow.slick-hidden {
   display: none;
 }
+
+.slick-pagination {
+  border-radius: 8px 0 8px 0;
+  background-color: #1f2022;
+  border-width: 1px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 10px;
+  padding-right: 10px;
+  opacity: 0.3;
+  position: absolute;
+  right: 0;
+  bottom: 8px;
+
+  li {
+    display: none;
+    &.slick-active {
+      display: block;
+    }
+
+    p {
+      color: #f8f9fa;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: -1px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+  }
+}

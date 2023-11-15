@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Storage } from "../../../modules/Storage";
 import HeaderLogo from "../../../assets/images/header-logo.png";
 import MobileMenu from "./mobile";
 
@@ -7,6 +8,7 @@ const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
+    setIsLogin(Storage.get("accountKey") ? true : false);
     const header = document.querySelector(".fixed-navbar");
     const sticky = header.offsetTop;
     const scrollCallBack = window.addEventListener("scroll", () => {
@@ -53,13 +55,7 @@ const Header = () => {
                     </button>
                     <ul className="nav navbar-nav mb-2 mb-lg-0">
                       <li>
-                        <Link to="/home">비용안내</Link>
-                      </li>
-                      <li>
-                        <Link to="/home">회사소개</Link>
-                      </li>
-                      <li>
-                        <Link to="/home">Q&A</Link>
+                        <Link to="/home">HOME</Link>
                       </li>
 
                       {isLogin ? (

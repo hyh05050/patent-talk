@@ -257,14 +257,14 @@ const Contents = () => {
                 <LoginButton type="submit">로그인</LoginButton>
                 <LoginLinkBox>
                   <Link to={"/join"}>회원가입</Link>
-                  <Link to={"#"}>아이디 찾기</Link>
+                  {/* <Link to={"#"}>아이디 찾기</Link> */}
                   <Link to={"#"}>비밀번호 찾기</Link>
                 </LoginLinkBox>
               </div>
-              <div className="lawyer-login">
+              {/* <div className="lawyer-login">
                 <span>혹시 변리사님이신가요?</span>
                 <Link to={"#"}>변리사 로그인</Link>
-              </div>
+              </div> */}
             </LoginPageDiv>
           </LoginPage>
         </form>

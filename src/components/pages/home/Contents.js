@@ -3,6 +3,8 @@ import styled from "styled-components";
 import PatentIcon from "../../../assets/images/patent.png";
 import dummyImg from "../../../assets/images/funding_img_pc.webp";
 import AttorneySlider from "./AttorneySlider";
+import MainBanner from "./MainBanner";
+import BannerSlider from "./BannerSlider";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -209,6 +211,11 @@ const Section2Div = styled.div`
 const Contents = () => {
   return (
     <main>
+      <section>
+        <MainBanner />
+        <BannerSlider />
+      </section>
+
       <section>
         <div className="container mb-32">
           <FieldTitle className="animate">특허별 견적</FieldTitle>
