@@ -44,7 +44,7 @@ const LogoImg = styled.img`
   width: 140px;
   margin-right: 50px;
 
-  @media (max-width: 1200px) {
+  @media screen and (max-width: 1200px) {
     margin-right: 20px;
   }
 `;
@@ -58,12 +58,12 @@ const LeftMenuItemDiv = styled.div`
   &:not(:last-child) {
     margin-right: 24px;
 
-    @media (max-width: 1200px) {
+    @media screen and (max-width: 1200px) {
       margin-right: 10px;
     }
   }
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     display: none;
   }
 `;
@@ -108,12 +108,12 @@ const SearchInput = styled.input`
     border: 1px solid #004744;
   }
 
-  @media (max-width: 1200px) {
+  @media screen and (max-width: 1200px) {
     width: 250px;
     padding-right: 10px;
   }
 
-  @media (max-width: 760px) {
+  @media screen and (max-width: 760px) {
     display: none;
   }
 `;

@@ -27,7 +27,7 @@ const Header = () => {
     };
   }, []);
 
-  const onClickMenuBtn = () => {};
+  // const onClickMenuBtn = () => {};
 
   return (
     <div className="fixed-navbar">

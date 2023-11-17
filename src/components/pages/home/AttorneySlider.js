@@ -28,7 +28,7 @@ const SliderItem = styled.div`
   background-color: #ffffff;
   border-width: 1px;
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     width: 318px;
     padding: 36px 24px 36px;
   }
@@ -74,7 +74,7 @@ const AttorneyNameBox = styled.div`
     font-size: 18px;
     line-height: 26px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #17181a;
       font-weight: 600;
       font-size: 13px;
@@ -128,7 +128,7 @@ const PriceTitle = styled.div`
       margin-right: 32px;
     }
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #1f2022;
       font-weight: 700;
       font-size: 10px;
@@ -141,7 +141,7 @@ const Hr = styled.hr`
   width: 100%;
   margin-bottom: 14px;
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     margin-bottom: 10px;
   }
 `;
@@ -174,7 +174,7 @@ const SolutionTitle = styled(PriceTitle)`
       margin-right: 32px;
     }
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #1f2022;
       font-weight: 700;
       font-size: 10px;
@@ -201,7 +201,7 @@ const SolutionItemTitle = styled.div`
     font-size: 14px;
     line-height: 20px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #1f2022;
       font-weight: 700;
       font-size: 10px;
@@ -217,7 +217,7 @@ const SolutionItemContent = styled.div`
     line-height: 24px;
     letter-spacing: -0.1px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #484f54;
       font-weight: 400;
       font-size: 10px;

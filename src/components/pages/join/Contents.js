@@ -7,12 +7,16 @@ import { useForm } from "react-hook-form";
 const JoinPage = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: flex-start;
   margin: 0 auto;
 
   width: 100%;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 84px);
   background-color: #f6f6f6;
+
+  @media screen and (min-width: 1500px) {
+    min-height: calc(100vh - 94px);
+  }
 `;
 
 const JoinPageDiv = styled.div`
@@ -33,8 +37,12 @@ const JoinPageDiv = styled.div`
     background-color: #fff;
     margin-top: 48px;
 
-    padding: 40px 20px;
-    margin: 20px 0 24px;
+    padding: 30px 20px;
+    margin: 20px 0 0;
+
+    @media screen and (max-width: 440px) {
+      width: 100%;
+    }
   }
 
   .lawyer-Join {
@@ -194,7 +202,7 @@ const JoinButton = styled.button`
   flex-wrap: wrap;
   width: 100%;
   height: 52px;
-  background-color: #295240;
+  background-color: #202d90;
   margin-top: 12px;
 
   &.disabled {
@@ -268,7 +276,7 @@ const Contents = () => {
         {
           message: "비밀번호가 일치하지 않습니다.",
         },
-        { shouldFocus: true },
+        { shouldFocus: true }
       );
       return;
     }

@@ -30,7 +30,7 @@ const BannerBox = styled(RowDiv)`
 
 const LeftBanner = styled(ColumnDiv)`
   flex: 3;
-  justify-content: start;
+  justify-content: flex-start;
   min-width: unset;
   margin-right: 27px;
 `;
@@ -202,7 +202,7 @@ const RightBanner = styled.div`
   flex: 0;
   flex-wrap: nowrap;
   flex-direction: column;
-  justify-content: start;
+  justify-content: flex-start;
 
   @media screen and (min-width: 960px) {
     flex: 1;

@@ -20,7 +20,7 @@ const MenuDiv = styled.div`
   flex-wrap: wrap;
   width: auto;
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     align-items: center;
     width: 100%;
   }
@@ -37,7 +37,7 @@ const MenuItem = styled.div`
     margin-right: 0;
   }
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     width: 50%;
     margin-right: 0;
     margin-bottom: 16px;

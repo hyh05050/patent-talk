@@ -1,10 +1,11 @@
 import React from "react";
 import styled from "styled-components";
-import PatentIcon from "../../../assets/images/patent.png";
 import dummyImg from "../../../assets/images/funding_img_pc.webp";
 import AttorneySlider from "./AttorneySlider";
 import MainBanner from "./MainBanner";
 import BannerSlider from "./BannerSlider";
+import { useNavigate } from "react-router-dom";
+import { categoryList, subCategoryList } from "../attorney/Category";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -46,17 +47,23 @@ const Field = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
 
+  &.active_category {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #202d90;
+    color: #fff;
+  }
+
   &:hover {
     box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
   }
 
-  @media (min-width: 961px) {
+  @media screen and (min-width: 961px) {
     &:nth-child(4n) {
       margin-right: 0;
     }
   }
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     height: 74px;
     padding: 16px 10px 16px;
     margin-right: 16px;
@@ -72,7 +79,7 @@ const Field = styled.div`
     font-size: 18px;
     line-height: 26px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #17181a;
       text-align: initial;
       white-space: nowrap;
@@ -86,7 +93,7 @@ const Field = styled.div`
     width: 56px;
     height: 56px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       width: 42px;
       height: 42px;
     }
@@ -113,17 +120,23 @@ const PatentField = styled.div`
   flex-direction: row;
   flex-wrap: nowrap;
 
+  &.active_category {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #202d90;
+    color: #fff;
+  }
+
   &:hover {
     box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
   }
 
-  @media (min-width: 961px) {
+  @media screen and (min-width: 961px) {
     &:nth-child(5n) {
       margin-right: 0;
     }
   }
 
-  @media (max-width: 960px) {
+  @media screen and (max-width: 960px) {
     height: 74px;
     padding: 16px 10px 16px;
     margin-right: 16px;
@@ -139,7 +152,7 @@ const PatentField = styled.div`
     font-size: 18px;
     line-height: 26px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       color: #17181a;
       text-align: initial;
       white-space: nowrap;
@@ -153,7 +166,7 @@ const PatentField = styled.div`
     width: 56px;
     height: 56px;
 
-    @media (max-width: 960px) {
+    @media screen and (max-width: 960px) {
       width: 42px;
       height: 42px;
     }
@@ -184,7 +197,7 @@ const Section2Div = styled.div`
       line-height: 40px;
       color: white;
 
-      @media (min-width: 960px) {
+      @media screen and (min-width: 960px) {
         font-size: 44px;
         line-height: 60px;
       }
@@ -209,6 +222,24 @@ const Section2Div = styled.div`
 `;
 
 const Contents = () => {
+  const navigate = useNavigate();
+
+  const onClickCategory = (e, params) => {
+    const target = e.target.closest("div");
+    const active = document.querySelector(".active_category");
+
+    if (active) {
+      active.classList.remove("active_category");
+    }
+    target.classList.add("active_category");
+
+    //딜레이 1초
+
+    setTimeout(() => {
+      navigate("/attorney/" + params);
+    }, 500);
+  };
+
   return (
     <main>
       <section>
@@ -221,22 +252,12 @@ const Contents = () => {
           <FieldTitle className="animate">특허별 견적</FieldTitle>
 
           <FieldDiv>
-            <Field>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </Field>
-            <Field>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </Field>
-            <Field>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </Field>
-            <Field>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </Field>
+            {categoryList.map((item, index) => (
+              <Field key={index} onClick={(e) => onClickCategory(e, item.name)}>
+                <p>{item.title}</p>
+                <img src={item.icon} alt="icon" />
+              </Field>
+            ))}
           </FieldDiv>
         </div>
       </section>
@@ -246,38 +267,12 @@ const Contents = () => {
           <PatentFieldTitle className="animate">분야별 견적</PatentFieldTitle>
 
           <PatentFieldDiv>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
-            <PatentField>
-              <p>특허</p>
-              <img src={PatentIcon} alt="icon" />
-            </PatentField>
+            {subCategoryList.map((item, index) => (
+              <PatentField key={index} onClick={(e) => onClickCategory(e, item.name)}>
+                <p>{item.title}</p>
+                <img src={item.icon} alt="icon" />
+              </PatentField>
+            ))}
           </PatentFieldDiv>
         </div>
       </section>

@@ -8,12 +8,16 @@ import { Storage } from "../../../modules/Storage";
 const LoginPage = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: start;
+  justify-content: flex-start;
   margin: 0 auto;
 
   width: 100%;
-  min-height: calc(100vh - 80px);
+  min-height: calc(100vh - 84px);
   background-color: #f6f6f6;
+
+  @media screen and (min-width: 1500px) {
+    min-height: calc(100vh - 94px);
+  }
 `;
 
 const LoginPageDiv = styled.div`
@@ -36,6 +40,10 @@ const LoginPageDiv = styled.div`
 
     padding: 40px 20px;
     margin: 40px 0 24px;
+
+    @media screen and (max-width: 440px) {
+      width: 100%;
+    }
   }
 
   .lawyer-login {
@@ -146,7 +154,7 @@ const LoginButton = styled.button`
   flex-wrap: wrap;
   width: 100%;
   height: 52px;
-  background-color: #295240;
+  background-color: #202d90;
   margin-bottom: 24px;
 `;
 

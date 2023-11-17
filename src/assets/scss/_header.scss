@@ -190,7 +190,7 @@
   }
 }
 
-.topbar .theme-btn-s2 {
+.topbar {
   padding: 15px 20px;
   font-size: 14px;
   font-weight: 600;
@@ -811,10 +811,6 @@
     bottom: 0;
     transform: translateX(-50%);
 
-    .theme-btn-s2 {
-      float: right;
-    }
-
     .mini-btn {
       width: 240px;
     }
@@ -955,6 +951,7 @@
     padding: 0;
     border: 0;
     @include rounded-border(0);
+    min-height: 84px;
 
     > .container {
       position: relative;
