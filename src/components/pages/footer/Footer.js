@@ -162,7 +162,7 @@ const Footer = () => {
           </MenuDiv>
 
           <InfoDiv>
-            <InfoTitle>인디프로 | 변리사 특허의뢰는, 인디프로</InfoTitle>
+            <InfoTitle>인디프 | 변리사 특허의뢰는, 인디프</InfoTitle>
             <InfoDetail>특허를 신청하고, 임시 출원을 하세요.</InfoDetail>
           </InfoDiv>
 
@@ -178,7 +178,7 @@ const Footer = () => {
               (주)인디프로는 어떠한 법적 책임을 지지 않습니다. 본 웹사이트에서 취득한 정보를 바탕으로 하여 어떠한 조치를
               취하시기에 앞서 반드시 법률전문가와 충분한 상담을 진행하시기 바랍니다.
               <br />
-              (주)인디프로은 공정한 수임질서를 지키기 위해 노력하며 변호사법 및 기타 관련 규정을 준수하고 있습니다. 모든
+              (주)인디프로은 공정한 수임질서를 지키기 위해 노력하며 변리사법 및 기타 관련 규정을 준수하고 있습니다. 모든
               특허상담은 인디프로에 가입한 변리사 회원이 직접 진행합니다. 인디프로에 표시된 변리사 회원의 정보는 해당
               변리사 회원이 직접 제공한 것이며, 모든 변리사 회원은 독립적으로 업무를 수행합니다.
             </InfoDetail>
@@ -188,22 +188,22 @@ const Footer = () => {
 
           <SNSDiv>
             <SNSItem>
-              <Link to="/about">
+              <Link to="/home">
                 <SNSTitle>네이버 블로그</SNSTitle>
               </Link>
             </SNSItem>
             <SNSItem>
-              <Link to="/about">
+              <Link to="/home">
                 <SNSTitle>인스타그램</SNSTitle>
               </Link>
             </SNSItem>
             <SNSItem>
-              <Link to="/about">
+              <Link to="/home">
                 <SNSTitle>링크드인</SNSTitle>
               </Link>
             </SNSItem>
             <SNSItem>
-              <Link to="/about">
+              <Link to="/home">
                 <SNSTitle>카카오톡 채널</SNSTitle>
               </Link>
             </SNSItem>
@@ -211,7 +211,7 @@ const Footer = () => {
 
           <CorpDiv>
             <CorpItem>
-              <CorpTitle>© 2023 Indieipro</CorpTitle>
+              <CorpTitle>© 2023 Indieip</CorpTitle>
             </CorpItem>
             <CorpItem>
               <Link to="/about">

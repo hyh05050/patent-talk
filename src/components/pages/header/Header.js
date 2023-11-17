@@ -75,10 +75,10 @@ const Header = () => {
                 <div className="col-lg-3 col-md-2 col-2 header-right-btn">
                   <div className="header-right">
                     <div className="close-form">
-                      <Link className="theme-btn" to="/apply">
+                      <Link className="theme-btn" to="/attorney">
                         변리사 찾기
                       </Link>
-                      <Link className="theme-btn mobile" to="/apply">
+                      <Link className="theme-btn mobile" to="/attorney">
                         신청
                       </Link>
                     </div>
