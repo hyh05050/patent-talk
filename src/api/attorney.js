@@ -10,7 +10,7 @@ export const attorneyApi = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
     getMatching: builder.query({
-      query: () => `/matching`,
+      query: () => `/attorney`,
     }),
     addMatching: builder.mutation({
       query: (payload) => httpObject("/attorney", "POST", payload),

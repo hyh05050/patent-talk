@@ -5,7 +5,7 @@ import AttorneySlider from "./AttorneySlider";
 import MainBanner from "./MainBanner";
 import BannerSlider from "./BannerSlider";
 import { useNavigate } from "react-router-dom";
-import { categoryList, subCategoryList } from "../attorney/Category";
+import { categoryList, subCategoryList } from "../preMatching/Category";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -236,7 +236,7 @@ const Contents = () => {
     //딜레이 1초
 
     setTimeout(() => {
-      navigate("/attorney/" + params);
+      navigate("/preMatching/" + params);
     }, 500);
   };
 
