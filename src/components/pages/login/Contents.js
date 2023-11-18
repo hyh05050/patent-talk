@@ -4,6 +4,8 @@ import styled from "styled-components";
 import { useLoginMutation } from "../../../api/account";
 import { useForm } from "react-hook-form";
 import { Storage } from "../../../modules/Storage";
+import { useAppDispatch } from "../../../store";
+import { setAlertModal } from "../../../store/slice/modal";
 
 const LoginPage = styled.div`
   display: flex;
@@ -184,6 +186,7 @@ const LoginLinkBox = styled.div`
 const Contents = () => {
   const navigate = useNavigate();
   const [loginAPI] = useLoginMutation();
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -203,10 +206,22 @@ const Contents = () => {
           if (authToken) Storage.set("authUser", authToken);
           if (refreshToken) Storage.set("refreshToken", refreshToken);
 
-          alert("로그인 성공");
-          navigate("/");
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "로그인", message: "로그인에 성공하였습니다." },
+              callback: () => {
+                navigate("/");
+              },
+            })
+          );
         } else {
-          alert("로그인 실패");
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "로그인", message: "로그인에 실패하였습니다." },
+            })
+          );
         }
       })
       .then((err) => {

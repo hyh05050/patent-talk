@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
 import { useForm } from "react-hook-form";
+import { useAppDispatch } from "../../../store";
+import { setAlertModal } from "../../../store/slice/modal";
 
 const JoinPage = styled.div`
   display: flex;
@@ -216,6 +218,7 @@ const Contents = () => {
   const requiredPolicy = ["policy1", "policy2", "policy3"];
   const policyList = requiredPolicy.concat(["policy4"]);
   const [isChecked, setChecked] = useState(false);
+  const dispatch = useAppDispatch();
 
   const {
     register,
@@ -234,10 +237,22 @@ const Contents = () => {
       .unwrap()
       .then(({ status }) => {
         if (status === "success") {
-          alert("회원가입 성공");
-          navigate("/login");
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "회원가입", message: "회원가입에 성공하였습니다." },
+              callback: () => {
+                navigate("/login");
+              },
+            })
+          );
         } else {
-          alert("회원가입 실패");
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "회원가입", message: "회원가입에 실패하였습니다." },
+            })
+          );
         }
       })
       .then((err) => {

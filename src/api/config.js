@@ -1,4 +1,5 @@
-export const BASE_URL = "https://indieip.startlump.com/api";
+const isDev = true;
+export const BASE_URL = isDev ? "http://localhost:8084/api" : "https://indieip.startlump.com/api";
 export const getApi = (baseUrl) => (main) => (sub) => (etc) => {
   return [baseUrl, main, sub, etc].join("/");
 };

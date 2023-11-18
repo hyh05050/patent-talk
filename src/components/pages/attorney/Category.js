@@ -17,7 +17,7 @@ export const categoryList = [
     icon: PatentIcon,
   },
   {
-    name: "others",
+    name: "etc",
     title: "기타",
     icon: PatentIcon,
   },
@@ -60,7 +60,7 @@ export const subCategoryList = [
     icon: PatentIcon,
   },
   {
-    name: "etc",
+    name: "others",
     title: "기타",
     icon: PatentIcon,
   },
@@ -83,7 +83,7 @@ export const trademarkList = [
     icon: PatentIcon,
   },
   {
-    name: "etc",
+    name: "others",
     title: "기타",
     icon: PatentIcon,
   },
