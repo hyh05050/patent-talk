@@ -4,6 +4,7 @@ import "../../../assets/scss/slick.scss";
 import "../../../assets/scss/slick-theme.scss";
 import styled from "styled-components";
 import BannerImg from "../../../assets/images/banner_slider.webp";
+import { Link } from "react-router-dom";
 
 const SliderBox = styled.div`
   display: flex;
@@ -52,7 +53,7 @@ const SliderItemBox = styled.div`
 
 const SliderItem1 = styled.div`
   border-radius: 8px;
-  background-color: #008f7f;
+  background-color: #202d90;
   border-width: 1px;
   padding-top: 21px;
   padding-bottom: 0;
@@ -241,7 +242,9 @@ const BannerSlider = () => {
                 <SliderItem1Content>
                   <LBTextBox>
                     <LBMatchingButton>
-                      <p>변리사 상담받기</p>
+                      <Link to="/preMatching">
+                        <p>변리사 상담받기</p>
+                      </Link>
                     </LBMatchingButton>
                     <LBTitle>
                       여러 변리사 답변을 <br /> 5분만에 확인해보세요

@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import BannerImg from "../../../assets/images/banner.webp";
+import { Link } from "react-router-dom";
 
 const ColumnDiv = styled.div`
   display: flex;
@@ -37,7 +38,7 @@ const LeftBanner = styled(ColumnDiv)`
 
 const LBContent = styled.div`
   border-radius: 8px;
-  background-color: #008f7f;
+  background-color: #202d90;
   border-width: 1px;
   padding-top: 21px;
   padding-bottom: 0;
@@ -315,7 +316,9 @@ const MainBanner = () => {
           <LBContentBox>
             <LBTextBox>
               <MatchingButton>
-                <p>변리사 찾기</p>
+                <Link to={"/preMatching"}>
+                  <p>변리사 찾기</p>
+                </Link>
               </MatchingButton>
               <LBTitle>
                 여러 변리사 답변을 <br /> 5분 만에 확인해보세요
@@ -338,7 +341,9 @@ const MainBanner = () => {
         <RBContent>
           <RBContentBox>
             <RBMatchingButton>
-              <p>변리사 찾기</p>
+              <Link to={"/preMatching"}>
+                <p>변리사 찾기</p>
+              </Link>
             </RBMatchingButton>
             <RBTitle>변리사 비용이 부담된다면 전액 지원받으세요</RBTitle>
             <RBSubTitle>

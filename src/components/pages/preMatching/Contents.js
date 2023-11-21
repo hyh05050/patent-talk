@@ -8,6 +8,10 @@ import { Controller } from "react-hook-form";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
 import { useAddPreMatchingMutation } from "../../../api/preMatching";
+import arrowIcon from "../../../assets/images/arrow-up.png";
+import closeIcon from "../../../assets/images/close.png";
+import fileIcon from "../../../assets/images/file.png";
+import attachFileIcon from "../../../assets/images/attach-file.png";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -18,6 +22,7 @@ const FieldTitle = styled.h2`
   transform: translate3d(0px, 40px, 0px);
   opacity: 0;
   transition: transform 1000ms ease 300ms, opacity 1000ms ease;
+  margin-bottom: 16px;
 
   &.animate {
     opacity: 1;
@@ -31,8 +36,13 @@ const FieldBox = styled.div`
   justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
+  gap: 20px;
 
   margin-bottom: 16px;
+
+  @media screen and (max-width: 960px) {
+    gap: 16px;
+  }
 `;
 
 const Field = styled.div`
@@ -40,8 +50,6 @@ const Field = styled.div`
   border-radius: 8px;
   background-color: transparent;
   border: 1px solid #e9ecef;
-  margin-top: 16px;
-  margin-right: 20px;
   padding: 20px;
   height: 100px;
   flex: 0 1 calc((100% - 60px) / 4);
@@ -61,21 +69,10 @@ const Field = styled.div`
     box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
   }
 
-  @media screen and (min-width: 961px) {
-    &:nth-child(4n) {
-      margin-right: 0;
-    }
-  }
-
   @media screen and (max-width: 960px) {
     height: 74px;
-    padding: 16px 10px 16px;
-    margin-right: 16px;
+    padding: 16px 10px;
     flex: 0 1 calc((100% - 16px) / 2);
-
-    &:nth-child(2n) {
-      margin-right: 0;
-    }
   }
 
   p {
@@ -103,71 +100,145 @@ const Field = styled.div`
   }
 `;
 
-const PatentField = styled.div`
-  position: relative;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid #e9ecef;
-  margin-top: 16px;
-  margin-right: 20px;
-  padding: 20px;
-  height: 100px;
-  flex: 0 1 calc((100% - 80px) / 5);
-
+const ToggleListBox = styled.div`
   display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  flex-wrap: nowrap;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
+
+const ToggleBox = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  div.field {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 10px;
+    margin-bottom: 6px;
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+
+    div.title {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-direction: row;
+
+      img {
+        width: 48px;
+        height: 48px;
+        margin-right: 16px;
+      }
+
+      p {
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 26px;
+      }
+    }
+
+    div.icon {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      margin-right: 10px;
+
+      img {
+        width: 24px;
+        height: 24px;
+        transform: rotate(180deg);
+        transition: transform 0.5s ease;
+      }
+    }
+  }
+
+  div.item_box {
+    width: 100%;
+    min-height: 4px;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+
+    row-gap: 0px;
+    column-gap: 16px;
+
+    div.item {
+      display: flex;
+      justify-items: center;
+      flex-direction: row;
+      flex-wrap: nowrap;
+
+      cursor: pointer;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+
+      visibility: hidden;
+      opacity: 0;
+      height: 0px;
+      padding: 0px 10px;
+      transition: all 0.5s ease;
+
+      &.active {
+        background-color: #202d90;
+        color: #fff;
+      }
+
+      div.title {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: row;
+
+        p {
+          font-weight: 700;
+          font-size: 16px;
+          line-height: 26px;
+        }
+      }
+    }
+  }
 
   &.active {
-    transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: #202d90;
-    color: #fff;
-  }
+    div.field {
+      &.no_item {
+        background-color: #202d90;
+        color: #fff;
+      }
 
-  &:hover {
-    box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
-  }
-
-  @media screen and (min-width: 961px) {
-    &:nth-child(5n) {
-      margin-right: 0;
+      div.icon {
+        img {
+          transform: rotate(0deg);
+          transition: transform 0.5s ease;
+        }
+      }
     }
-  }
 
-  @media screen and (max-width: 960px) {
-    height: 74px;
-    padding: 16px 10px 16px;
-    margin-right: 16px;
-    flex: 0 1 calc((100% - 16px) / 2);
-
-    &:nth-child(2n) {
-      margin-right: 0;
-    }
-  }
-
-  p {
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 26px;
-
-    @media screen and (max-width: 960px) {
-      color: #17181a;
-      text-align: initial;
-      white-space: nowrap;
-      font-weight: 600;
-      font-size: 16px;
-      line-height: 24px;
-    }
-  }
-
-  img {
-    width: 56px;
-    height: 56px;
-
-    @media screen and (max-width: 960px) {
-      width: 42px;
-      height: 42px;
+    div.item_box {
+      row-gap: 8px;
+      column-gap: 16px;
+      transition: all 0.5s ease;
+      div.item {
+        visibility: visible;
+        opacity: 1;
+        height: 48px;
+        padding: 10px;
+        transition: all 0.5s ease;
+      }
     }
   }
 `;
@@ -179,14 +250,14 @@ const InputField = styled.div`
   justify-content: center;
   align-items: flex-start;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 
   label {
     font-weight: 600;
     font-size: 16px;
     line-height: 24px;
     color: #000000;
-    margin-bottom: 8px;
+    margin-bottom: 16px;
   }
 
   input[type="text"] {
@@ -225,7 +296,6 @@ const InputFileBox = styled.div`
   font-size: 16px;
   line-height: 24px;
   color: #000000;
-  margin-top: 10px;
 
   input[type="file"] {
     position: absolute;
@@ -246,6 +316,12 @@ const InputFileBox = styled.div`
     cursor: pointer;
     color: #757575;
     margin: 0;
+
+    img {
+      width: 24px;
+      height: 24px;
+      margin-left: 8px;
+    }
   }
 `;
 
@@ -271,6 +347,12 @@ const FileListBox = styled.div`
     line-height: 24px;
     color: #000;
 
+    img.file_icon {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+    }
+
     span {
       display: inline-block;
       max-width: 200px;
@@ -284,6 +366,11 @@ const FileListBox = styled.div`
       background-color: transparent;
       border: none;
       cursor: pointer;
+
+      img {
+        width: 16px;
+        height: 16px;
+      }
     }
   }
 `;
@@ -322,6 +409,7 @@ const Contents = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState([false, false, false, false]);
   const [subCategory, setSubCategory] = useState(null);
+  const [lastCategory, setLastCategory] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [preMatchingAPI] = useAddPreMatchingMutation();
   const dispatch = useAppDispatch();
@@ -329,7 +417,6 @@ const Contents = () => {
   const {
     register: patentReg,
     control,
-    setValue: setPatentValue,
     handleSubmit: patentSubmit,
     setError: setPatentError,
     clearErrors: clearPatentErrors,
@@ -354,7 +441,7 @@ const Contents = () => {
     register: designReg,
     handleSubmit: designSubmit,
     setError: setDesignError,
-    clearErrors: clearDesignErrors,
+    // clearErrors: clearDesignErrors,
     reset: resetDesign,
     formState: { errors: designErrors },
   } = useForm();
@@ -363,7 +450,7 @@ const Contents = () => {
     register: etcReg,
     handleSubmit: etcSubmit,
     setError: setEtcError,
-    clearErrors: clearEtcErrors,
+    // clearErrors: clearEtcErrors,
     reset: resetEtc,
     formState: { errors: etcErrors },
   } = useForm();
@@ -423,14 +510,24 @@ const Contents = () => {
     const categoryFlag = Array.from({ length: 4 }, (_, index) => index === trueIndex);
     setFileList([]);
     setSubCategory(null);
+    setLastCategory(null);
     resetFormData();
     setCategory(categoryFlag);
   };
 
   const onClickSubCategory = (paramCategory) => {
-    if (subCategory === paramCategory) return;
-    clearErrors();
+    if (subCategory === paramCategory) {
+      setSubCategory(null);
+      return false;
+    }
     setSubCategory(paramCategory);
+    setLastCategory(null);
+  };
+
+  const onClickLastCategory = (paramCategory) => {
+    if (lastCategory === paramCategory) return false;
+
+    setLastCategory(paramCategory);
   };
 
   const onChangeFile = (e) => {
@@ -444,7 +541,6 @@ const Contents = () => {
       );
       return;
     }
-    console.log(files);
     setFileList([...fileList, ...files]);
   };
 
@@ -454,7 +550,7 @@ const Contents = () => {
   };
 
   const onSubmit = (data, type) => {
-    const params = { type: "", subType: "", name: "", keyword: "", detail: "" };
+    const params = { type: "", subType: "", lastType: "", name: "", keyword: "", detail: "" };
 
     if (type === "patent") {
       if (subCategory === null) {
@@ -475,6 +571,7 @@ const Contents = () => {
 
       params.type = "patent";
       params.subType = subCategory;
+      params.lastType = lastCategory;
       params.detail = data.patentDetail;
     }
 
@@ -525,7 +622,7 @@ const Contents = () => {
   };
 
   return (
-    <main>
+    <main style={{ minHeight: "700px" }}>
       <section>
         <div className="container mb-32 main_category">
           <FieldTitle className="animate">간편 신청</FieldTitle>
@@ -547,18 +644,39 @@ const Contents = () => {
             <div className="container mb-32 sub_category">
               <FieldTitle className="animate">특허 상세 분류(선택)</FieldTitle>
 
-              <FieldBox>
+              <ToggleListBox>
                 {subCategoryList.map((category, index) => (
-                  <PatentField
-                    key={index}
-                    className={subCategory === category.name && "active"}
-                    onClick={() => onClickSubCategory(category.name)}
-                  >
-                    <p>{category.title}</p>
-                    <img src={category.icon} alt="icon" />
-                  </PatentField>
+                  <ToggleBox key={"subcategory_" + index} className={subCategory === category.name && "active"}>
+                    <div
+                      className={category.items.length === 0 ? "field no_item" : "field"}
+                      onClick={() => onClickSubCategory(category.name)}
+                    >
+                      <div className="title">
+                        <img src={category.icon} alt="icon" />
+                        <p>{category.title}</p>
+                      </div>
+                      <div className="icon">
+                        <img src={arrowIcon} alt="arrow_icon" />
+                      </div>
+                    </div>
+                    <div className="item_box">
+                      {category.items.map((item, index) => (
+                        <div
+                          key={category.name + "_" + index}
+                          className={lastCategory === item ? "item active" : "item"}
+                          onClick={() => onClickLastCategory(item)}
+                        >
+                          <div className="title">
+                            <p>{item}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ToggleBox>
                 ))}
+              </ToggleListBox>
 
+              <FieldBox>
                 {patentErrors?.subCategory && (
                   <WarningMessageBox>
                     <WarningMessage>{patentErrors.subCategory.message}</WarningMessage>
@@ -599,6 +717,7 @@ const Contents = () => {
                       />
                       <label className="file_label" htmlFor="patentFile">
                         특허 파일을 등록해주세요.
+                        <img src={attachFileIcon} alt="file_icon" />
                       </label>
                     </InputFileBox>
                   )}
@@ -607,8 +726,11 @@ const Contents = () => {
                 <FileListBox>
                   {fileList.map((file, index) => (
                     <div key={"patent_" + index}>
+                      <img src={fileIcon} className="file_icon" alt="file_icon" />
                       <span>{file.name}</span>
-                      <button onClick={() => onClickRemoveFile(index)}>X</button>
+                      <button onClick={() => onClickRemoveFile(index)}>
+                        <img src={closeIcon} />
+                      </button>
                     </div>
                   ))}
                 </FileListBox>
@@ -751,7 +873,9 @@ const Contents = () => {
                   {fileList.map((file, index) => (
                     <div key={"design_" + index}>
                       <span>{file.name}</span>
-                      <button onClick={() => onClickRemoveFile(index)}>X</button>
+                      <button onClick={() => onClickRemoveFile(index)}>
+                        <img src={closeIcon} />
+                      </button>
                     </div>
                   ))}
                 </FileListBox>
@@ -813,7 +937,9 @@ const Contents = () => {
                   {fileList.map((file, index) => (
                     <div key={"etc_" + index}>
                       <span>{file.name}</span>
-                      <button onClick={() => onClickRemoveFile(index)}>X</button>
+                      <button onClick={() => onClickRemoveFile(index)}>
+                        <img src={closeIcon} />
+                      </button>
                     </div>
                   ))}
                 </FileListBox>

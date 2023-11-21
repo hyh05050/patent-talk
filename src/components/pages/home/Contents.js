@@ -16,6 +16,7 @@ const FieldTitle = styled.h2`
   transform: translate3d(0px, 40px, 0px);
   opacity: 0;
   transition: transform 1000ms ease 300ms, opacity 1000ms ease;
+  margin-bottom: 16px;
 
   &.animate {
     opacity: 1;
@@ -23,29 +24,34 @@ const FieldTitle = styled.h2`
   }
 `;
 
-const FieldDiv = styled.div`
+const FieldBox = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
   flex-wrap: wrap;
+
+  gap: 20px;
+
+  @media screen and (max-width: 960px) {
+    gap: 16px;
+  }
 `;
 
 const Field = styled.div`
   position: relative;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid #e9ecef;
-  margin-top: 16px;
-  margin-right: 20px;
-  padding: 20px;
-  height: 100px;
-  flex: 0 1 calc((100% - 60px) / 4);
-
   display: flex;
+  flex: 0 1 calc((100% - 60px) / 4);
   justify-content: space-between;
   flex-direction: row;
   flex-wrap: nowrap;
+
+  height: 100px;
+  padding: 20px;
+
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid #e9ecef;
 
   &.active_category {
     transition: background-color 0.3s ease, color 0.3s ease;
@@ -57,21 +63,10 @@ const Field = styled.div`
     box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
   }
 
-  @media screen and (min-width: 961px) {
-    &:nth-child(4n) {
-      margin-right: 0;
-    }
-  }
-
   @media screen and (max-width: 960px) {
     height: 74px;
     padding: 16px 10px 16px;
-    margin-right: 16px;
     flex: 0 1 calc((100% - 16px) / 2);
-
-    &:nth-child(2n) {
-      margin-right: 0;
-    }
   }
 
   p {
@@ -102,74 +97,15 @@ const Field = styled.div`
 
 const PatentFieldTitle = styled(FieldTitle)``;
 
-const PatentFieldDiv = styled(FieldDiv)``;
+const PatentFieldBox = styled(FieldBox)``;
 
-const PatentField = styled.div`
-  position: relative;
-  border-radius: 8px;
-  background-color: transparent;
-  border: 1px solid #e9ecef;
-  margin-top: 16px;
-  margin-right: 20px;
-  padding: 20px;
-  height: 100px;
+const PatentField = styled(Field)`
   flex: 0 1 calc((100% - 80px) / 5);
-
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-  flex-wrap: nowrap;
-
-  &.active_category {
-    transition: background-color 0.3s ease, color 0.3s ease;
-    background-color: #202d90;
-    color: #fff;
-  }
-
-  &:hover {
-    box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
-  }
-
-  @media screen and (min-width: 961px) {
-    &:nth-child(5n) {
-      margin-right: 0;
-    }
-  }
 
   @media screen and (max-width: 960px) {
     height: 74px;
     padding: 16px 10px 16px;
-    margin-right: 16px;
     flex: 0 1 calc((100% - 16px) / 2);
-
-    &:nth-child(2n) {
-      margin-right: 0;
-    }
-  }
-
-  p {
-    font-weight: 700;
-    font-size: 18px;
-    line-height: 26px;
-
-    @media screen and (max-width: 960px) {
-      color: #17181a;
-      text-align: initial;
-      white-space: nowrap;
-      font-weight: 600;
-      font-size: 16px;
-      line-height: 24px;
-    }
-  }
-
-  img {
-    width: 56px;
-    height: 56px;
-
-    @media screen and (max-width: 960px) {
-      width: 42px;
-      height: 42px;
-    }
   }
 `;
 
@@ -251,29 +187,29 @@ const Contents = () => {
         <div className="container mb-32">
           <FieldTitle className="animate">특허별 견적</FieldTitle>
 
-          <FieldDiv>
+          <FieldBox>
             {categoryList.map((item, index) => (
               <Field key={index} onClick={(e) => onClickCategory(e, item.name)}>
                 <p>{item.title}</p>
                 <img src={item.icon} alt="icon" />
               </Field>
             ))}
-          </FieldDiv>
+          </FieldBox>
         </div>
       </section>
 
       <section>
         <div className="container mb-32">
-          <PatentFieldTitle className="animate">분야별 견적</PatentFieldTitle>
+          <FieldTitle className="animate">분야별 견적</FieldTitle>
 
-          <PatentFieldDiv>
+          <FieldBox>
             {subCategoryList.map((item, index) => (
               <PatentField key={index} onClick={(e) => onClickCategory(e, item.name)}>
                 <p>{item.title}</p>
                 <img src={item.icon} alt="icon" />
               </PatentField>
             ))}
-          </PatentFieldDiv>
+          </FieldBox>
         </div>
       </section>
 

@@ -41,7 +41,7 @@ const Header = () => {
                     <MobileMenu />
                   </div>
                 </div>
-                <div className="col-lg-3 col-md-6 col-6">
+                <div className="col-lg-3 col-md-6 col-sm-6 col-6">
                   <div className="navbar-header">
                     <Link className="navbar-brand" to="/home">
                       <img src={HeaderLogo} alt="" />
