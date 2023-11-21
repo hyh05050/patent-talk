@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-// import HeaderLogo from "../../../assets/images/header-logo.png";
+// import HeaderLogo from "../../assets/images/header-logo.png";
 
 const FooterDiv = styled.div`
   display: flex;

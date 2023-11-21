@@ -1,9 +1,9 @@
 import React from "react";
-import Contents from "../components/pages/preMatching/Contents";
 import Header from "../components/header/Header";
 import Footer from "../components/footer/Footer";
+import Contents from "../components/pages/mypage/Contents";
 
-const PreMatching = () => {
+const Mypage = () => {
   return (
     <>
       <Header />
@@ -13,4 +13,4 @@ const PreMatching = () => {
   );
 };
 
-export default PreMatching;
+export default Mypage;

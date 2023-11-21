@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Join from "./pages/Join";
 import PreMatching from "./pages/PreMatching";
+import Mypage from "./pages/Mypage";
 
 const MainRouter = () => {
   return (
@@ -13,6 +14,7 @@ const MainRouter = () => {
       <Route path="/join" element={<Join />} />
       <Route path="/preMatching" element={<PreMatching />} />
       <Route path="/preMatching/:field" element={<PreMatching />} />
+      <Route path="/mypage" element={<Mypage />} />
     </Routes>
   );
 };

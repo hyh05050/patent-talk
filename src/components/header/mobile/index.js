@@ -1,37 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Collapse, CardBody, Card } from "./Collapse";
 import { Link } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
+import { Storage } from "../../../modules/Storage";
 import "./style.css";
 
 const menus = [
   {
     id: 1,
-    title: "비용안내",
-    link: "/home",
+    title: "로그인&가입",
+    link: "/login",
+    loginFlag: false,
   },
-
   {
     id: 2,
-    title: "회사소개",
-    link: "/home",
-  },
-
-  {
-    id: 3,
-    title: "Q&A",
-    link: "/home",
-  },
-  {
-    id: 4,
-    title: "로그인&가입",
-    link: "/home",
-    loginFlag: undefined,
-  },
-  {
-    id: 5,
     title: "마이페이지",
-    link: "/home",
+    link: "/mypage",
     loginFlag: true,
   },
 ];
@@ -40,6 +24,10 @@ const MobileMenu = () => {
   const [isMenuShow, setIsMenuShow] = useState(false);
   const [isOpen, setIsOpen] = useState(0);
   const [isLogin, setIsLogin] = useState(false);
+
+  useEffect(() => {
+    setIsLogin(Storage.get("accountKey") ? true : false);
+  }, []);
 
   const ClickHandler = () => {
     window.scrollTo(10, 0);
@@ -65,12 +53,10 @@ const MobileMenu = () => {
                   </p>
                 ) : (
                   <>
-                    {item.id < 4 || item.loginFlag === isLogin ? (
+                    {item.loginFlag === isLogin && (
                       <Link onClick={ClickHandler} to={item.link}>
                         {item.title}
                       </Link>
-                    ) : (
-                      ""
                     )}
                   </>
                 )}

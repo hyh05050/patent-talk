@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Storage } from "../../../modules/Storage";
-import HeaderLogo from "../../../assets/images/header-logo.png";
+import { Storage } from "../../modules/Storage";
+import HeaderLogo from "../../assets/images/header-logo.png";
 import MobileMenu from "./mobile";
 
 const Header = () => {
@@ -28,6 +28,10 @@ const Header = () => {
   }, []);
 
   // const onClickMenuBtn = () => {};
+  const onClickLogout = () => {
+    Storage.remove("accountKey");
+    window.location.href = "/home";
+  };
 
   return (
     <div className="fixed-navbar">
@@ -61,7 +65,10 @@ const Header = () => {
                       {isLogin ? (
                         <>
                           <li>
-                            <Link to="/home">마이페이지</Link>
+                            <Link to="/mypage">마이페이지</Link>
+                          </li>
+                          <li onClick={onClickLogout}>
+                            <Link>로그아웃</Link>
                           </li>
                         </>
                       ) : (
