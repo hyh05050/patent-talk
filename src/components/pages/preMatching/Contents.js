@@ -1,17 +1,15 @@
-import React, { useState } from "react";
-import styled from "styled-components";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import { categoryList, trademarkList, subCategoryList } from "./Category";
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Controller } from "react-hook-form";
-import { useAppDispatch } from "../../../store";
-import { setAlertModal } from "../../../store/slice/modal";
+import styled from "styled-components";
 import { useAddPreMatchingMutation } from "../../../api/preMatching";
 import arrowIcon from "../../../assets/images/arrow-up.png";
+import attachFileIcon from "../../../assets/images/attach-file.png";
 import closeIcon from "../../../assets/images/close.png";
 import fileIcon from "../../../assets/images/file.png";
-import attachFileIcon from "../../../assets/images/attach-file.png";
+import { useAppDispatch } from "../../../store";
+import { setAlertModal } from "../../../store/slice/modal";
+import { categoryList, subCategoryList, trademarkList } from "./Category";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -203,7 +201,7 @@ const ToggleBox = styled.div`
         justify-content: center;
         align-items: center;
         flex-direction: row;
-
+        width: 100%;
         p {
           font-weight: 700;
           font-size: 16px;
@@ -235,7 +233,8 @@ const ToggleBox = styled.div`
       div.item {
         visibility: visible;
         opacity: 1;
-        height: 48px;
+        min-width: 100px;
+        height: 56px;
         padding: 10px;
         transition: all 0.5s ease;
       }
@@ -320,7 +319,7 @@ const InputFileBox = styled.div`
     img {
       width: 24px;
       height: 24px;
-      margin-left: 8px;
+      margin-left: auto;
     }
   }
 `;
