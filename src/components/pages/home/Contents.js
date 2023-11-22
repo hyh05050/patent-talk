@@ -95,10 +95,6 @@ const Field = styled.div`
   }
 `;
 
-const PatentFieldTitle = styled(FieldTitle)``;
-
-const PatentFieldBox = styled(FieldBox)``;
-
 const PatentField = styled(Field)`
   flex: 0 1 calc((100% - 80px) / 5);
 

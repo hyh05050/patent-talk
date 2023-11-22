@@ -6,8 +6,8 @@ import styled from "styled-components";
 import closeIcon from "../../assets/images/close.png";
 
 const ModalBox = styled.div`
-  min-width: 200px;
-  min-height: 200px;
+  min-width: 250px;
+  min-height: 188px;
   background: #fff;
   border-radius: 10px;
   padding: 20px;
@@ -58,8 +58,6 @@ const ModalBox = styled.div`
 
   .modal-footer {
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
 
     button {
       //theme color

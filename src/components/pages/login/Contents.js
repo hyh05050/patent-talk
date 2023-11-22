@@ -199,12 +199,7 @@ const Contents = () => {
       .unwrap()
       .then(({ status, data: account, refreshToken, authToken }) => {
         if (status === "success") {
-          if (account) {
-            if (account.accountKey) Storage.set("accountKey", account.accountKey);
-          }
-
-          if (authToken) Storage.set("authUser", authToken);
-          if (refreshToken) Storage.set("refreshToken", refreshToken);
+          Storage.login(account, refreshToken, authToken);
 
           dispatch(
             setAlertModal({

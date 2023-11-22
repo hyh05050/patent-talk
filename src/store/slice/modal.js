@@ -10,6 +10,7 @@ const defaultData = {
 
 const initialState = {
   alert: { ...defaultData },
+  matching: { ...defaultData },
 };
 
 // accountSlice는 account의 state를 변경하는 reducer를 가지고 있다.
@@ -26,10 +27,20 @@ export const modalSlice = createSlice({
         };
       }
     },
+
+    setPreMatchingModal: (state, action) => {
+      if (action.payload) {
+        state.matching = action.payload;
+      } else {
+        state.matching = {
+          ...defaultData,
+        };
+      }
+    },
   },
 });
 
 // accountSlice의 reducer를 export한다.
-export const { setAlertModal } = modalSlice.actions;
+export const { setAlertModal, setPreMatchingModal } = modalSlice.actions;
 
 export default modalSlice.reducer;

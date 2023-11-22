@@ -96,3 +96,49 @@ export const trademarkList = [
     icon: PatentIcon,
   },
 ];
+
+export const convertCodeToText = (category, depth) => {
+  if (depth === "main") {
+    switch (category) {
+      case "patent":
+        return "특허/실용신안";
+      case "trademark":
+        return "상표";
+      case "design":
+        return "디자인";
+      case "etc":
+        return "기타";
+      default:
+        return "기타";
+    }
+  } else if (depth === "sub") {
+    switch (category) {
+      case "elec":
+        return "전기전자";
+      case "machine":
+        return "기계";
+      case "chemistry":
+        return "화학";
+      case "physics":
+        return "물리";
+      case "it":
+        return "IT";
+      case "life":
+        return "생활";
+      case "bm":
+        return "BM";
+      case "others":
+        return "기타";
+      case "text":
+        return "문자 상표";
+      case "shape":
+        return "도형 상표";
+      case "unit":
+        return "결합 상표";
+      case "others":
+        return "기타";
+      default:
+        return "기타";
+    }
+  }
+};

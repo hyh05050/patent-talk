@@ -180,6 +180,7 @@ const ToggleBox = styled.div`
       justify-items: center;
       flex-direction: row;
       flex-wrap: nowrap;
+      min-width: 100px;
 
       cursor: pointer;
       border: 1px solid #e9ecef;
@@ -233,7 +234,6 @@ const ToggleBox = styled.div`
       div.item {
         visibility: visible;
         opacity: 1;
-        min-width: 100px;
         height: 56px;
         padding: 10px;
         transition: all 0.5s ease;
@@ -408,7 +408,7 @@ const Contents = () => {
   const navigate = useNavigate();
   const [category, setCategory] = useState([false, false, false, false]);
   const [subCategory, setSubCategory] = useState(null);
-  const [lastCategory, setLastCategory] = useState(null);
+  const [detailCategory, setDetailCategory] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [preMatchingAPI] = useAddPreMatchingMutation();
   const dispatch = useAppDispatch();
@@ -509,7 +509,7 @@ const Contents = () => {
     const categoryFlag = Array.from({ length: 4 }, (_, index) => index === trueIndex);
     setFileList([]);
     setSubCategory(null);
-    setLastCategory(null);
+    setDetailCategory(null);
     resetFormData();
     setCategory(categoryFlag);
   };
@@ -520,13 +520,13 @@ const Contents = () => {
       return false;
     }
     setSubCategory(paramCategory);
-    setLastCategory(null);
+    setDetailCategory(null);
   };
 
-  const onClickLastCategory = (paramCategory) => {
-    if (lastCategory === paramCategory) return false;
+  const onClickDetailCategory = (paramCategory) => {
+    if (detailCategory === paramCategory) return false;
 
-    setLastCategory(paramCategory);
+    setDetailCategory(paramCategory);
   };
 
   const onChangeFile = (e) => {
@@ -560,6 +560,14 @@ const Contents = () => {
         return;
       }
 
+      if (subCategory !== "기타" && subCategory !== "BM" && detailCategory === null) {
+        setPatentError("detailCategory", {
+          type: "manual",
+          message: "특허 상세 분류를 선택해주세요.",
+        });
+        return;
+      }
+
       if (fileList.length === 0) {
         setPatentError("patentFile", {
           type: "manual",
@@ -570,7 +578,7 @@ const Contents = () => {
 
       params.type = "patent";
       params.subType = subCategory;
-      params.detailType = lastCategory;
+      params.detailType = detailCategory;
       params.detail = data.patentDetail;
     }
 
@@ -662,8 +670,8 @@ const Contents = () => {
                       {category.items.map((item, index) => (
                         <div
                           key={category.name + "_" + index}
-                          className={lastCategory === item ? "item active" : "item"}
-                          onClick={() => onClickLastCategory(item)}
+                          className={detailCategory === item ? "item active" : "item"}
+                          onClick={() => onClickDetailCategory(item)}
                         >
                           <div className="title">
                             <p>{item}</p>
@@ -679,6 +687,12 @@ const Contents = () => {
                 {patentErrors?.subCategory && (
                   <WarningMessageBox>
                     <WarningMessage>{patentErrors.subCategory.message}</WarningMessage>
+                  </WarningMessageBox>
+                )}
+
+                {patentErrors?.detailCategory && (
+                  <WarningMessageBox>
+                    <WarningMessage>{patentErrors.detailCategory.message}</WarningMessage>
                   </WarningMessageBox>
                 )}
               </FieldBox>
@@ -728,7 +742,7 @@ const Contents = () => {
                       <img src={fileIcon} className="file_icon" alt="file_icon" />
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
-                        <img src={closeIcon} />
+                        <img src={closeIcon} alt="closeIcon" />
                       </button>
                     </div>
                   ))}
@@ -873,7 +887,7 @@ const Contents = () => {
                     <div key={"design_" + index}>
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
-                        <img src={closeIcon} />
+                        <img src={closeIcon} alt="closeIcon" />
                       </button>
                     </div>
                   ))}
@@ -937,7 +951,7 @@ const Contents = () => {
                     <div key={"etc_" + index}>
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
-                        <img src={closeIcon} />
+                        <img src={closeIcon} alt="closeIcon" />
                       </button>
                     </div>
                   ))}

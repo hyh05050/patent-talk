@@ -8,6 +8,7 @@ const Header = () => {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     setIsLogin(Storage.get("accountKey") ? true : false);
     const header = document.querySelector(".fixed-navbar");
     const sticky = header.offsetTop;
@@ -26,12 +27,6 @@ const Header = () => {
       window.removeEventListener("scroll", scrollCallBack);
     };
   }, []);
-
-  // const onClickMenuBtn = () => {};
-  const onClickLogout = () => {
-    Storage.remove("accountKey");
-    window.location.href = "/home";
-  };
 
   return (
     <div className="fixed-navbar">
@@ -66,9 +61,6 @@ const Header = () => {
                         <>
                           <li>
                             <Link to="/mypage">마이페이지</Link>
-                          </li>
-                          <li onClick={onClickLogout}>
-                            <Link>로그아웃</Link>
                           </li>
                         </>
                       ) : (
