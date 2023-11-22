@@ -1,11 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dummyImg from "../../../assets/images/funding_img_pc.webp";
-import AttorneySlider from "./AttorneySlider";
-import MainBanner from "./MainBanner";
-import BannerSlider from "./BannerSlider";
-import { useNavigate } from "react-router-dom";
 import { categoryList, subCategoryList } from "../preMatching/Category";
+import AttorneySlider from "./AttorneySlider";
+import BannerSlider from "./BannerSlider";
+import MainBanner from "./MainBanner";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -217,7 +217,7 @@ const Contents = () => {
         <div className="container">
           <Section2Div>
             <div>
-              <p>인디프로 변리사비 지원 서비스</p>
+              <p>인디프 변리사비 지원 서비스</p>
               <h2>부담스러운 특허비용을 지원해드려요</h2>
             </div>
             <div>
@@ -225,7 +225,7 @@ const Contents = () => {
             </div>
             <div>
               <p>변리사비 지원도 신청하고</p>
-              <button type="button">인디프로에서 특허 신청하기</button>
+              <button type="button">인디프에서 특허 신청하기</button>
             </div>
           </Section2Div>
         </div>
