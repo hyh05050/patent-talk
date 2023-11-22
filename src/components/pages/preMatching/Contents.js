@@ -549,7 +549,7 @@ const Contents = () => {
   };
 
   const onSubmit = (data, type) => {
-    const params = { type: "", subType: "", lastType: "", name: "", keyword: "", detail: "" };
+    const params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "" };
 
     if (type === "patent") {
       if (subCategory === null) {
@@ -570,7 +570,7 @@ const Contents = () => {
 
       params.type = "patent";
       params.subType = subCategory;
-      params.lastType = lastCategory;
+      params.detailType = lastCategory;
       params.detail = data.patentDetail;
     }
 
