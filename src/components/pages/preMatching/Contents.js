@@ -7,6 +7,7 @@ import arrowIcon from "../../../assets/images/arrow-up.png";
 import attachFileIcon from "../../../assets/images/attach-file.png";
 import closeIcon from "../../../assets/images/close.png";
 import fileIcon from "../../../assets/images/file.png";
+import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
 import { categoryList, subCategoryList, trademarkList } from "./Category";
@@ -549,7 +550,7 @@ const Contents = () => {
   };
 
   const onSubmit = (data, type) => {
-    const params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "" };
+    const params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "", orderId: "" };
 
     if (type === "patent") {
       if (subCategory === null) {
@@ -624,6 +625,7 @@ const Contents = () => {
       params.type = "etc";
       params.detail = data.etcDetail;
     }
+    params.orderId = Storage.get("accountKey");
 
     matching(params);
   };
