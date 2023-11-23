@@ -7,6 +7,14 @@ import { setAlertModal, setPreMatchingModal } from "../../../store/slice/modal";
 import { useGetPreMatchingQuery } from "../../../api/preMatching";
 import { convertCodeToText as CTT } from "../preMatching/Category";
 
+const Container = styled.div`
+  padding: 120px 0;
+
+  @media (max-width: 991px) {
+    padding: 40px 0;
+  }
+`;
+
 const UserInfo = styled.div`
   position: relative;
   display: flex;
@@ -145,12 +153,21 @@ const MatchingContents = styled.div`
   padding: 0;
   margin-top: 60px;
   width: 100%;
+
+  @media (max-width: 991px) {
+    margin-top: 20px;
+  }
 `;
 
 const MatchingTable = styled.table`
+  display: table;
   border-collapse: collapse;
   background-color: #fff;
   width: 100%;
+
+  @media screen and (max-width: 767px) {
+    display: none;
+  }
 
   tr {
     text-align: center;
@@ -183,16 +200,80 @@ const MatchingTable = styled.table`
   }
 `;
 
+const MatchingBox = styled.div`
+  position: relative;
+  display: none;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  box-sizing: border-box;
+
+  @media screen and (max-width: 767px) {
+    display: flex;
+  }
+
+  div.item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    flex: 1 0 50%;
+    max-width: calc(50% - 10px);
+    background-color: #fff;
+    padding: 20px;
+
+    @media screen and (max-width: 600px) {
+      flex: 1 0 100%; /* 한 줄에 한 개씩 표시 */
+      max-width: 100%;
+    }
+
+    p {
+      font-size: 16px;
+      margin-bottom: 10px;
+
+      span {
+        font-size: 14px;
+      }
+    }
+
+    div.button {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+
+      div {
+        flex: 1;
+        button {
+          width: 100%;
+          font-size: 18px;
+          padding: 5px 10px;
+          transition: all 0.3s ease-in-out;
+
+          &:hover {
+            color: #fff;
+            background-color: #1b267b;
+          }
+        }
+      }
+    }
+  }
+`;
+
 const Contents = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [isLogin] = useState(Storage.get("accountKey") ? true : false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const { data: matchings, isLoading } = useGetPreMatchingQuery();
+  const { data: matchings, isLoading } = useGetPreMatchingQuery({ order_id: Storage.get("accountKey") });
 
   useEffect(() => {
-    console.log("isLogin", isLogin);
     if (!isLogin) {
       dispatch(
         setAlertModal({
@@ -225,15 +306,15 @@ const Contents = () => {
   return (
     <main style={{ minHeight: "800px", background: "#e5ecef" }}>
       <section>
-        <div className="container" style={{ padding: "120px 0" }}>
+        <Container className="container">
           <div className="row">
             <div className="col-lg-3 col-12">
-              <UserInfo>
+              <UserInfo className="d-none d-lg-block">
                 <p className="user_name">{userName}</p>
                 <p className="user_email">{email}</p>
               </UserInfo>
 
-              <MyPageMenu>
+              <MyPageMenu className="d-none d-lg-block">
                 <p className="title">마이페이지</p>
                 <ul>
                   <li>
@@ -258,8 +339,8 @@ const Contents = () => {
                     </p>
                   </MatchingMenu>
                   <MatchingMenu className="col no_content" />
-                  <MatchingMenu className="col no_content" />
-                  <MatchingMenu className="col no_content" />
+                  <MatchingMenu className="col no_content d-none d-md-block" />
+                  <MatchingMenu className="col no_content d-none d-md-block" />
                 </MatchingMenuBox>
               </div>
 
@@ -303,11 +384,47 @@ const Contents = () => {
                       ))}
                     </tbody>
                   </MatchingTable>
+
+                  <MatchingBox>
+                    {matchings.data?.map((matching, index) => (
+                      <div key={"matching_" + index} className="item">
+                        <p>
+                          신청일 : <span>{matching.createdAt?.substring(0, 10)}</span>
+                        </p>
+                        <p>
+                          특허 유형 : <span>{CTT(matching.type, "main")}</span>
+                        </p>
+                        <p>
+                          분류 :{" "}
+                          <span>
+                            {matching.detailType
+                              ? CTT(matching.subType, "sub") + "-" + matching.detailType
+                              : CTT(matching.subType, "sub")}
+                          </span>
+                        </p>
+                        <p>
+                          상세 정보 : <span>{matching.detail}</span>
+                        </p>
+                        <div className="button">
+                          <div>
+                            <button type="button" className="download-btn">
+                              추가 자료
+                            </button>
+                          </div>
+                          <div>
+                            <button type="button" className="download-btn">
+                              매칭 결과
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </MatchingBox>
                 </MatchingContents>
               </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
     </main>
   );

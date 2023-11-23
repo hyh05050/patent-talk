@@ -21,7 +21,7 @@ export const attorneySlice = createSlice({
       // addMatcher는 accountApi의 reducer를 추가한다.
       // accountApi.endpoints.login.matchFulfilled는 accountApi.login의 response가 성공했을 때 실행된다.
       .addMatcher(
-        (action) => attorneyApi.endpoints.getMatching.matchFulfilled(action),
+        (action) => attorneyApi.endpoints.getAttorney.matchFulfilled(action),
         (state, { payload }) => {
           console.log(payload);
           if (payload.status === "success") {
@@ -30,7 +30,7 @@ export const attorneySlice = createSlice({
           }
         }
       )
-      .addMatcher(attorneyApi.endpoints.addMatching.matchFulfilled, (state, { payload }) => {
+      .addMatcher(attorneyApi.endpoints.addAttorney.matchFulfilled, (state, { payload }) => {
         const { accountKey, password, humanName } = payload.data;
         state.account.accountKey = accountKey;
         state.account.password = password;

@@ -10,7 +10,7 @@ import fileIcon from "../../../assets/images/file.png";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
-import { categoryList, subCategoryList, trademarkList } from "./Category";
+import { categoryList } from "./Category";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -407,12 +407,23 @@ const WarningMessage = styled.p`
 const Contents = () => {
   const { field } = useParams();
   const navigate = useNavigate();
-  const [category, setCategory] = useState([false, false, false, false]);
-  const [subCategory, setSubCategory] = useState(null);
-  const [detailCategory, setDetailCategory] = useState(null);
+  const [type, setType] = useState(null);
+  const [subType, setSubType] = useState(null);
+  const [detailType, setDetailType] = useState(null);
   const [fileList, setFileList] = useState([]);
   const [preMatchingAPI] = useAddPreMatchingMutation();
   const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    if (field) {
+      if (categoryList.some((item) => item.name === field)) {
+        setType(field);
+      } else {
+        setSubType(field);
+        setType("patent");
+      }
+    }
+  }, [field]);
 
   const {
     register: patentReg,
@@ -422,11 +433,7 @@ const Contents = () => {
     clearErrors: clearPatentErrors,
     reset: resetPatent,
     formState: { errors: patentErrors },
-  } = useForm({
-    defaultValues: {
-      subCategory: "",
-    },
-  });
+  } = useForm();
 
   const {
     register: trademarkReg,
@@ -454,21 +461,6 @@ const Contents = () => {
     reset: resetEtc,
     formState: { errors: etcErrors },
   } = useForm();
-
-  useEffect(() => {
-    if (field) {
-      if (categoryList.find((item) => item.name === field)) {
-        const categoryFlag = Array.from(
-          { length: 4 },
-          (_, index) => index === categoryList.findIndex((item) => item.name === field)
-        );
-        setCategory(categoryFlag);
-      } else {
-        setSubCategory(field);
-        setCategory([true, false, false, false]);
-      }
-    }
-  }, [field]);
 
   const matching = (params) => {
     console.log(params);
@@ -500,34 +492,46 @@ const Contents = () => {
     resetEtc();
   };
 
+  const typeInit = (depth) => {
+    if (depth === 0) {
+      setFileList([]);
+      setSubType(null);
+      setDetailType(null);
+    }
+    if (depth === 1) {
+      setDetailType(null);
+    }
+    clearErrors();
+  };
+
   const clearErrors = () => {
-    if (category === "patent") clearPatentErrors("subCategory");
-    if (category === "trademark") clearTrademarkErrors("subCategory");
+    clearPatentErrors("subType");
+    clearPatentErrors("detailType");
+    clearTrademarkErrors("subType");
   };
 
-  const onClickCategory = (trueIndex) => {
-    if (category[trueIndex]) return;
-    const categoryFlag = Array.from({ length: 4 }, (_, index) => index === trueIndex);
-    setFileList([]);
-    setSubCategory(null);
-    setDetailCategory(null);
+  const onClickType = (paramType) => {
+    if (type === paramType) return;
+
     resetFormData();
-    setCategory(categoryFlag);
+    typeInit(0);
+    setType(paramType);
   };
 
-  const onClickSubCategory = (paramCategory) => {
-    if (subCategory === paramCategory) {
-      setSubCategory(null);
+  const onClickSubType = (paramType) => {
+    if (subType === paramType) {
+      setSubType(null);
       return false;
     }
-    setSubCategory(paramCategory);
-    setDetailCategory(null);
+    typeInit(1);
+    setSubType(paramType);
   };
 
-  const onClickDetailCategory = (paramCategory) => {
-    if (detailCategory === paramCategory) return false;
+  const onClickDetailType = (paramType) => {
+    if (detailType === paramType) return false;
 
-    setDetailCategory(paramCategory);
+    typeInit(2);
+    setDetailType(paramType);
   };
 
   const onChangeFile = (e) => {
@@ -549,20 +553,20 @@ const Contents = () => {
     setFileList(newFileList);
   };
 
-  const onSubmit = (data, type) => {
+  const onSubmit = (data, paramType) => {
     const params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "", orderId: "" };
 
-    if (type === "patent") {
-      if (subCategory === null) {
-        setPatentError("subCategory", {
+    if (paramType === "patent") {
+      if (subType === null) {
+        setPatentError("subType", {
           type: "manual",
           message: "특허 상세 분류를 선택해주세요.",
         });
         return;
       }
 
-      if (subCategory !== "기타" && subCategory !== "BM" && detailCategory === null) {
-        setPatentError("detailCategory", {
+      if (subType !== "others" && subType !== "BM" && detailType === null) {
+        setPatentError("detailType", {
           type: "manual",
           message: "특허 상세 분류를 선택해주세요.",
         });
@@ -577,29 +581,24 @@ const Contents = () => {
         return;
       }
 
-      params.type = "patent";
-      params.subType = subCategory;
-      params.detailType = detailCategory;
       params.detail = data.patentDetail;
     }
 
-    if (type === "trademark") {
-      if (subCategory === null) {
-        setTrademarkError("subCategory", {
+    if (paramType === "trademark") {
+      if (subType === null) {
+        setTrademarkError("subType", {
           type: "manual",
           message: "상표 분류를 선택해주세요.",
         });
         return;
       }
 
-      params.type = "trademark";
-      params.subType = subCategory;
       params.name = data.trademarkName;
       params.keyword = data.keyword;
       params.detail = data.trademarkDetail;
     }
 
-    if (type === "design") {
+    if (paramType === "design") {
       if (fileList.length === 0) {
         setDesignError("designFile", {
           type: "manual",
@@ -608,12 +607,11 @@ const Contents = () => {
         return;
       }
 
-      params.type = "design";
       params.name = data.designName;
       params.detail = data.designDetail;
     }
 
-    if (type === "etc") {
+    if (paramType === "etc") {
       if (fileList.length === 0) {
         setEtcError("etcFile", {
           type: "manual",
@@ -622,9 +620,12 @@ const Contents = () => {
         return;
       }
 
-      params.type = "etc";
       params.detail = data.etcDetail;
     }
+
+    params.type = paramType;
+    params.subType = subType;
+    params.detailType = detailType;
     params.orderId = Storage.get("accountKey");
 
     matching(params);
@@ -637,10 +638,14 @@ const Contents = () => {
           <FieldTitle className="animate">간편 신청</FieldTitle>
 
           <FieldBox>
-            {categoryList.map((item, index) => (
-              <Field key={index} className={category[index] && "active"} onClick={() => onClickCategory(index)}>
-                <p>{item.title}</p>
-                <img src={item.icon} alt="icon" />
+            {categoryList.map((category, index) => (
+              <Field
+                key={index}
+                className={type === category.name && "active"}
+                onClick={() => onClickType(category.name)}
+              >
+                <p>{category.title}</p>
+                <img src={category.icon} alt="icon" />
               </Field>
             ))}
           </FieldBox>
@@ -648,32 +653,32 @@ const Contents = () => {
       </section>
 
       <section>
-        {category[0] && (
+        {type === categoryList[0].name && (
           <form onSubmit={patentSubmit((e) => onSubmit(e, "patent"))}>
             <div className="container mb-32 sub_category">
               <FieldTitle className="animate">특허 상세 분류(선택)</FieldTitle>
 
               <ToggleListBox>
-                {subCategoryList.map((category, index) => (
-                  <ToggleBox key={"subcategory_" + index} className={subCategory === category.name && "active"}>
+                {categoryList[0].typeList.map((patent, index) => (
+                  <ToggleBox key={"subType_" + index} className={subType === patent.name && "active"}>
                     <div
-                      className={category.items.length === 0 ? "field no_item" : "field"}
-                      onClick={() => onClickSubCategory(category.name)}
+                      className={patent.typeList.length === 0 ? "field no_item" : "field"}
+                      onClick={() => onClickSubType(patent.name)}
                     >
                       <div className="title">
-                        <img src={category.icon} alt="icon" />
-                        <p>{category.title}</p>
+                        <img src={patent.icon} alt="icon" />
+                        <p>{patent.title}</p>
                       </div>
                       <div className="icon">
                         <img src={arrowIcon} alt="arrow_icon" />
                       </div>
                     </div>
                     <div className="item_box">
-                      {category.items.map((item, index) => (
+                      {patent.typeList.map((item, index) => (
                         <div
-                          key={category.name + "_" + index}
-                          className={detailCategory === item ? "item active" : "item"}
-                          onClick={() => onClickDetailCategory(item)}
+                          key={patent.name + "_" + index}
+                          className={detailType === item ? "item active" : "item"}
+                          onClick={() => onClickDetailType(item)}
                         >
                           <div className="title">
                             <p>{item}</p>
@@ -686,15 +691,15 @@ const Contents = () => {
               </ToggleListBox>
 
               <FieldBox>
-                {patentErrors?.subCategory && (
+                {patentErrors?.subType && (
                   <WarningMessageBox>
-                    <WarningMessage>{patentErrors.subCategory.message}</WarningMessage>
+                    <WarningMessage>{patentErrors.subType.message}</WarningMessage>
                   </WarningMessageBox>
                 )}
 
-                {patentErrors?.detailCategory && (
+                {patentErrors?.detailType && (
                   <WarningMessageBox>
-                    <WarningMessage>{patentErrors.detailCategory.message}</WarningMessage>
+                    <WarningMessage>{patentErrors.detailType.message}</WarningMessage>
                   </WarningMessageBox>
                 )}
               </FieldBox>
@@ -740,7 +745,7 @@ const Contents = () => {
                 {patentErrors?.patentFile && <WarningMessage>{patentErrors.patentFile.message}</WarningMessage>}
                 <FileListBox>
                   {fileList.map((file, index) => (
-                    <div key={"patent_" + index}>
+                    <div key={"patent_file_" + index}>
                       <img src={fileIcon} className="file_icon" alt="file_icon" />
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
@@ -758,25 +763,25 @@ const Contents = () => {
       </section>
 
       <section>
-        {category[1] && (
+        {type === categoryList[1].name && (
           <form onSubmit={trademarkSubmit((e) => onSubmit(e, "trademark"))}>
             <div className="container mb-32 sub_category">
               <FieldTitle className="animate">상표 분류(선택)</FieldTitle>
 
               <FieldBox>
-                {trademarkList.map((category, index) => (
+                {categoryList[1].typeList.map((trademark, index) => (
                   <Field
                     key={index}
-                    className={subCategory === category.name && "active"}
-                    onClick={() => onClickSubCategory(category.name)}
+                    className={subType === trademark.name && "active"}
+                    onClick={() => onClickSubType(trademark.name)}
                   >
-                    <p>{category.title}</p>
-                    <img src={category.icon} alt="icon" />
+                    <p>{trademark.title}</p>
+                    <img src={trademark.icon} alt="icon" />
                   </Field>
                 ))}
-                {trademarkErrors?.subCategory && (
+                {trademarkErrors?.subType && (
                   <WarningMessageBox>
-                    <WarningMessage>{trademarkErrors.subCategory.message}</WarningMessage>
+                    <WarningMessage>{trademarkErrors.subType.message}</WarningMessage>
                   </WarningMessageBox>
                 )}
               </FieldBox>
@@ -827,7 +832,7 @@ const Contents = () => {
       </section>
 
       <section>
-        {category[2] && (
+        {type === categoryList[2].name && (
           <form onSubmit={designSubmit((e) => onSubmit(e, "design"))}>
             <div className="container mb-32 sub_category">
               <FieldTitle className="animate">디자인 (선택)</FieldTitle>
@@ -886,7 +891,7 @@ const Contents = () => {
 
                 <FileListBox>
                   {fileList.map((file, index) => (
-                    <div key={"design_" + index}>
+                    <div key={"design_file_" + index}>
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
                         <img src={closeIcon} alt="closeIcon" />
@@ -903,7 +908,7 @@ const Contents = () => {
       </section>
 
       <section>
-        {category[3] && (
+        {type === categoryList[3].name && (
           <form onSubmit={etcSubmit((e) => onSubmit(e, "etc"))}>
             <div className="container mb-32 sub_category">
               <FieldTitle className="animate">기타</FieldTitle>
@@ -950,7 +955,7 @@ const Contents = () => {
 
                 <FileListBox>
                   {fileList.map((file, index) => (
-                    <div key={"etc_" + index}>
+                    <div key={"etc_file_" + index}>
                       <span>{file.name}</span>
                       <button onClick={() => onClickRemoveFile(index)}>
                         <img src={closeIcon} alt="closeIcon" />

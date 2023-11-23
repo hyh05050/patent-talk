@@ -177,7 +177,7 @@ const PreMatchingModal = () => {
             <p className="contents-subtitle">5. 매칭 결과</p>
             <p className="contents-info">
               <a href="#" onClick={() => onClickDownload(modal.modalData?.fileUrl)}>
-                다운로드 링크
+                매칭 결과
               </a>
             </p>
           </div>

@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import dummyImg from "../../../assets/images/funding_img_pc.webp";
-import { categoryList, subCategoryList } from "../preMatching/Category";
+import { categoryList } from "../preMatching/Category";
 import AttorneySlider from "./AttorneySlider";
 import BannerSlider from "./BannerSlider";
 import MainBanner from "./MainBanner";
@@ -52,11 +52,14 @@ const Field = styled.div`
   border-radius: 8px;
   background-color: transparent;
   border: 1px solid #e9ecef;
+  color: #17181a;
 
-  &.active_category {
-    transition: background-color 0.3s ease, color 0.3s ease;
+  &.checked {
     background-color: #202d90;
     color: #fff;
+    transition-property: background-color, color;
+    transition-duration: 0.3s, 0.3s;
+    transition-timing-function: ease, ease;
   }
 
   &:hover {
@@ -75,7 +78,6 @@ const Field = styled.div`
     line-height: 26px;
 
     @media screen and (max-width: 960px) {
-      color: #17181a;
       text-align: initial;
       white-space: nowrap;
       font-weight: 600;
@@ -155,20 +157,12 @@ const Section2Div = styled.div`
 
 const Contents = () => {
   const navigate = useNavigate();
+  const [type, setType] = useState(null);
 
-  const onClickCategory = (e, params) => {
-    const target = e.target.closest("div");
-    const active = document.querySelector(".active_category");
-
-    if (active) {
-      active.classList.remove("active_category");
-    }
-    target.classList.add("active_category");
-
-    //딜레이 1초
-
+  const onClickType = (paramType) => {
+    setType(paramType);
     setTimeout(() => {
-      navigate("/preMatching/" + params);
+      navigate("/preMatching/" + paramType);
     }, 500);
   };
 
@@ -184,10 +178,14 @@ const Contents = () => {
           <FieldTitle className="animate">특허별 견적</FieldTitle>
 
           <FieldBox>
-            {categoryList.map((item, index) => (
-              <Field key={index} onClick={(e) => onClickCategory(e, item.name)}>
-                <p>{item.title}</p>
-                <img src={item.icon} alt="icon" />
+            {categoryList.map((category, index) => (
+              <Field
+                key={index}
+                className={type === category.name && "checked"}
+                onClick={(e) => onClickType(category.name)}
+              >
+                <p>{category.title}</p>
+                <img src={category.icon} alt="icon" />
               </Field>
             ))}
           </FieldBox>
@@ -199,10 +197,14 @@ const Contents = () => {
           <FieldTitle className="animate">분야별 견적</FieldTitle>
 
           <FieldBox>
-            {subCategoryList.map((item, index) => (
-              <PatentField key={index} onClick={(e) => onClickCategory(e, item.name)}>
-                <p>{item.title}</p>
-                <img src={item.icon} alt="icon" />
+            {categoryList[0].typeList.map((patent, index) => (
+              <PatentField
+                key={index}
+                className={type === patent.name && "checked"}
+                onClick={(e) => onClickType(patent.name)}
+              >
+                <p>{patent.title}</p>
+                <img src={patent.icon} alt="icon" />
               </PatentField>
             ))}
           </FieldBox>

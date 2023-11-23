@@ -6,18 +6,22 @@ import account from "./slice/account";
 import attorney from "./slice/attorney";
 import modal from "./slice/modal";
 import preMatching from "./slice/preMatching";
+import matching from "./slice/matching";
 import { accountApi } from "../api/account";
 import { attorneyApi } from "../api/attorney";
 import { preMatchingApi } from "../api/preMatching";
+import { matchingApi } from "../api/matching";
 
 const rootReducer = combineReducers({
   account,
   attorney,
   modal,
   preMatching,
+  matching,
   [accountApi.reducerPath]: accountApi.reducer,
   [attorneyApi.reducerPath]: attorneyApi.reducer,
   [preMatchingApi.reducerPath]: preMatchingApi.reducer,
+  [matchingApi.reducerPath]: matchingApi.reducer,
 });
 
 export const store = configureStore({
@@ -31,7 +35,8 @@ export const store = configureStore({
     })
       .concat(accountApi.middleware)
       .concat(attorneyApi.middleware)
-      .concat(preMatchingApi.middleware),
+      .concat(preMatchingApi.middleware)
+      .concat(matchingApi.middleware),
 });
 
 setupListeners(store.dispatch);
@@ -42,3 +47,4 @@ export const useAppSelector = useSelector;
 export const modalSelector = (state) => state.modal;
 export const accountSelector = (state) => state.account;
 export const preMatchingSelector = (state) => state.preMatching;
+export const matchingSelector = (state) => state.matching;

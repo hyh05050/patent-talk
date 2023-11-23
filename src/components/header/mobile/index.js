@@ -8,12 +8,18 @@ import "./style.css";
 const menus = [
   {
     id: 1,
+    title: "HOME",
+    link: "/home",
+    loginFlag: Storage.get("accountKey") ? true : false,
+  },
+  {
+    id: 2,
     title: "로그인&가입",
     link: "/login",
     loginFlag: false,
   },
   {
-    id: 2,
+    id: 3,
     title: "마이페이지",
     link: "/mypage",
     loginFlag: true,
@@ -60,6 +66,7 @@ const MobileMenu = () => {
                     )}
                   </>
                 )}
+
                 {item.submenu ? (
                   <Collapse isOpen={item.id === isOpen}>
                     <Card>
@@ -82,6 +89,11 @@ const MobileMenu = () => {
               </li>
             );
           })}
+          {isLogin && (
+            <li>
+              <Link onClick={() => Storage.logout()}>로그아웃</Link>
+            </li>
+          )}
         </ul>
       </div>
 

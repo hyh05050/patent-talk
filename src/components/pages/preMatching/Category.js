@@ -1,80 +1,57 @@
 import PatentIcon from "../../../assets/images/patent.png";
 
-export const categoryList = [
-  {
-    name: "patent",
-    title: "특허/실용신안",
-    icon: PatentIcon,
-  },
-  {
-    name: "trademark",
-    title: "상표",
-    icon: PatentIcon,
-  },
-  {
-    name: "design",
-    title: "디자인",
-    icon: PatentIcon,
-  },
-  {
-    name: "etc",
-    title: "기타",
-    icon: PatentIcon,
-  },
-];
-
-export const subCategoryList = [
+const patentList = [
   {
     name: "elec",
     title: "전기전자",
     icon: PatentIcon,
-    items: ["전기소자", "전자회로", "전기통신 기술", "기타"],
+    typeList: ["전기소자", "전자회로", "전기통신 기술", "기타"],
   },
   {
     name: "machine",
     title: "기계",
     icon: PatentIcon,
-    items: ["기관/펌프", "로봇", "조명/가열", "무기/폭파", "기타"],
+    typeList: ["기관/펌프", "로봇", "조명/가열", "무기/폭파", "기타"],
   },
   {
     name: "chemistry",
     title: "화학",
     icon: PatentIcon,
-    items: ["무기화학", "금속", "비료", "염료/페인트", "세제/왁스", "조합화학", "기타"],
+    typeList: ["무기화학", "금속", "비료", "염료/페인트", "세제/왁스", "조합화학", "기타"],
   },
   {
     name: "physics",
     title: "물리",
     icon: PatentIcon,
-    items: ["측정/시험", "광학", "신호/호출 시스템", "기타"],
+    typeList: ["측정/시험", "광학", "신호/호출 시스템", "기타"],
   },
   {
     name: "it",
     title: "IT",
     icon: PatentIcon,
-    items: ["인공지능", "빅데이터", "클라우드컴퓨팅", "사물인터넷", "블록체인", "융합서비스", "기타"],
+    typeList: ["인공지능", "빅데이터", "클라우드컴퓨팅", "사물인터넷", "블록체인", "융합서비스", "기타"],
   },
   {
     name: "life",
     title: "생활",
     icon: PatentIcon,
-    items: ["농업", "식품", "개인/가정용품", "건강/놀이", "기타"],
+    typeList: ["농업", "식품", "개인/가정용품", "건강/놀이", "기타"],
   },
   {
     name: "bm",
     title: "BM",
     icon: PatentIcon,
-    items: [],
+    typeList: [],
   },
   {
     name: "others",
     title: "기타",
     icon: PatentIcon,
-    items: [],
+    typeList: [],
   },
 ];
 
-export const trademarkList = [
+const trademarkList = [
   {
     name: "text",
     title: "문자 상표",
@@ -97,48 +74,47 @@ export const trademarkList = [
   },
 ];
 
-export const convertCodeToText = (category, depth) => {
+export const categoryList = [
+  {
+    name: "patent",
+    title: "특허/실용신안",
+    icon: PatentIcon,
+    typeList: patentList,
+  },
+  {
+    name: "trademark",
+    title: "상표",
+    icon: PatentIcon,
+    typeList: trademarkList,
+  },
+  {
+    name: "design",
+    title: "디자인",
+    icon: PatentIcon,
+    typeList: [],
+  },
+  {
+    name: "etc",
+    title: "기타",
+    icon: PatentIcon,
+    typeList: [],
+  },
+];
+
+export const convertCodeToText = (type, depth) => {
   if (depth === "main") {
-    switch (category) {
-      case "patent":
-        return "특허/실용신안";
-      case "trademark":
-        return "상표";
-      case "design":
-        return "디자인";
-      case "etc":
-        return "기타";
-      default:
-        return "기타";
-    }
+    categoryList.forEach((item) => {
+      if (item.name === type) {
+        return item.title;
+      }
+    });
   } else if (depth === "sub") {
-    switch (category) {
-      case "elec":
-        return "전기전자";
-      case "machine":
-        return "기계";
-      case "chemistry":
-        return "화학";
-      case "physics":
-        return "물리";
-      case "it":
-        return "IT";
-      case "life":
-        return "생활";
-      case "bm":
-        return "BM";
-      case "others":
-        return "기타";
-      case "text":
-        return "문자 상표";
-      case "shape":
-        return "도형 상표";
-      case "unit":
-        return "결합 상표";
-      case "others":
-        return "기타";
-      default:
-        return "기타";
-    }
+    patentList.forEach((item) => {
+      if (item.name === type) {
+        return item.title;
+      }
+    });
   }
+
+  return "기타";
 };

@@ -11,17 +11,35 @@ const SliderDiv = styled.div`
   position: relative;
   width: 100%;
   overflow: hidden;
-  padding: 40px 0;
+  padding-top: 40px;
 
   div.slick-slider {
-    width: 100%;
-    height: 100%;
-    max-height: 600px;
+    div.slick-track {
+      width: 100%;
+      height: 100%;
+      max-height: 590px;
+      overflow: hidden;
+    }
+
+    div.slick-slide {
+      min-width: 436px !important;
+      margin-bottom: 44px;
+    }
+
+    @media screen and (max-width: 960px) {
+      div.slick-track {
+        max-height: 538px;
+      }
+
+      div.slick-slide {
+        min-width: 318px !important;
+      }
+    }
   }
 `;
 
 const SliderItem = styled.div`
-  width: 436px;
+  width: 100%;
   padding: 40px 28px 40px;
   box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.05);
   border-radius: 16px;
@@ -29,7 +47,6 @@ const SliderItem = styled.div`
   border-width: 1px;
 
   @media screen and (max-width: 960px) {
-    width: 318px;
     padding: 36px 24px 36px;
   }
 `;

@@ -9,14 +9,14 @@ export const attorneyApi = createApi({
   reducerPath: "attorneyApi",
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
-    getMatching: builder.query({
+    getAttorney: builder.query({
       query: () => `/attorney`,
     }),
-    addMatching: builder.mutation({
+    addAttorney: builder.mutation({
       query: (payload) => httpObject("/attorney", "POST", payload),
     }),
   }),
 });
 
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
-export const { useGetMatchingQuery, useAddMatchingMutation } = attorneyApi;
+export const { useGetAttorneyQuery, useAddAttorneyMutation } = attorneyApi;

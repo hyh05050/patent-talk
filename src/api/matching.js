@@ -5,18 +5,18 @@ import { BASE_URL, httpObject } from "./config";
 // 엔드포인트는 query와 mutation으로 구분
 // query는 GET, mutation은 POST로 요청
 // query는 비동기로 처리되고, mutation은 동기로 처리
-export const preMatchingApi = createApi({
-  reducerPath: "preMatchingApi",
+export const matchingApi = createApi({
+  reducerPath: "matchingApi",
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
-    getPreMatching: builder.query({
-      query: (payload) => `/preMatching?orderId=${payload.order_id}`,
+    getMatching: builder.query({
+      query: (payload) => `/matching?orderId=${payload.order_id}`,
     }),
-    addPreMatching: builder.mutation({
-      query: (payload) => httpObject("/preMatching", "POST", payload),
+    addMatching: builder.mutation({
+      query: (payload) => httpObject("/matching", "POST", payload),
     }),
   }),
 });
 
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
-export const { useGetPreMatchingQuery, useAddPreMatchingMutation } = preMatchingApi;
+export const { useGetMatchingQuery, useAddMatchingMutation } = matchingApi;
