@@ -11,6 +11,7 @@ import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
 import { categoryList } from "./Category";
+import { base64String } from "../../../modules/fileEncoder";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -470,7 +471,7 @@ const Contents = () => {
       .unwrap()
       .then(({ status }) => {
         if (status === "success") {
-          navigate("/home");
+          navigate("/mypage");
         } else {
           dispatch(
             setAlertModal({
@@ -627,6 +628,13 @@ const Contents = () => {
     params.subType = subType;
     params.detailType = detailType;
     params.orderId = Storage.get("accountKey");
+
+    if (fileList.length > 0) {
+      const bs64FileList = fileList.map((file) => base64String(file));
+      Promise.all(bs64FileList).then((res) => {
+        // params.fileList = res;
+      });
+    }
 
     matching(params);
   };
