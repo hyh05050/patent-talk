@@ -36,6 +36,10 @@ const FieldBox = styled.div`
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
+
+  @media (max-width: 767px) {
+    display: none;
+  }
 `;
 
 const Field = styled.div`
@@ -172,6 +176,167 @@ const Field = styled.div`
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
+      }
+    }
+  }
+`;
+
+const CardBox = styled.div`
+  width: 100%;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+
+  @media (max-width: 767px) {
+    display: flex;
+  }
+`;
+
+const Card = styled.div`
+  width: 100%;
+  background: #fff;
+  padding: 20px;
+
+  &.active {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    background-color: #202d90;
+    color: #fff;
+  }
+
+  &:hover {
+    box-shadow: rgba(0, 0, 0, 0.07) 8px 8px 24px 0px;
+  }
+
+  div.attorney_info {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+
+    div.attorney_img {
+      min-width: 100px;
+      width: 100px;
+      height: 100px;
+      overflow: hidden;
+
+      img {
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 8px;
+
+      p.name {
+        font-size: 16px;
+        font-weight: 700;
+        margin-bottom: 5px;
+      }
+
+      p.company {
+        font-size: 14px;
+        font-weight: 400;
+        margin-bottom: 5px;
+      }
+
+      p.type {
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+  }
+
+  div.attorney_detail {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 20px;
+    padding: 10px;
+
+    div.careers {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 10px;
+
+      p.career {
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+
+    div.experience {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 10px;
+
+      p.exp {
+        font-size: 14px;
+        font-weight: 400;
+      }
+    }
+  }
+
+  div.footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: end;
+    gap: 20px;
+
+    div.estimate {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      margin: 20px 0;
+
+      p.price {
+        font-size: 20px;
+        line-height: 1.2;
+
+        span {
+          font-size: 25px;
+          font-weight: 700;
+        }
+      }
+    }
+
+    div.buttonBox {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 20px;
+
+      div {
+        flex: 1 0;
+        button {
+          width: 100%;
+          height: 40px;
+          border: 1px solid #000;
+          border-radius: 5px;
+          background: #fff;
+          color: #000;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+        }
       }
     }
   }
@@ -320,6 +485,54 @@ const Contents = () => {
               </Field>
             ))}
           </FieldBox>
+
+          <CardBox>
+            {matchingList.map((matching, index) => (
+              <Card key={"matching_" + index} className={proposal?.id === matching.id && "active"}>
+                <div className="attorney_info">
+                  <div className="attorney_img">
+                    <img src={matching.img} alt="user" />
+                  </div>
+                  <div>
+                    <p className="name">{matching.name}</p>
+                    <p className="company">{matching.company}</p>
+                    <p className="type">{matching.typeList.join(", ")}</p>
+                  </div>
+                </div>
+                <div className="attorney_detail">
+                  <div className="careers">
+                    {matching.careerList.map((career, index) => (
+                      <p className="career" key={index}>
+                        {career}
+                      </p>
+                    ))}
+                  </div>
+                  <div className="experience">
+                    {matching.expList.map((exp, index) => (
+                      <p className="exp" key={index}>
+                        {exp}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+                <div className="footer">
+                  <div className="estimate">
+                    <p className="price">
+                      견적가:<span>{matching.price}</span>
+                    </p>
+                  </div>
+                  <div className="buttonBox">
+                    <div>
+                      <button>상세보기</button>
+                    </div>
+                    <div>
+                      <button onClick={() => onClickProposal(matching)}>선택</button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </CardBox>
 
           <MatchingButton onClick={onClickMatching}>제안 선택</MatchingButton>
         </Container>

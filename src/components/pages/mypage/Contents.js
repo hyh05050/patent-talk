@@ -376,7 +376,7 @@ const Contents = () => {
                             </button>
                           </td>
                           <td>
-                            <button type="button" className="download-btn">
+                            <button type="button" className="download-btn" onClick={() => navigate("/matching")}>
                               확인
                             </button>
                           </td>
