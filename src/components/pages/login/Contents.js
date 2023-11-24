@@ -249,6 +249,7 @@ const Contents = () => {
                         message: "유효한 이메일 주소를 입력하세요.",
                       },
                     })}
+                    autoComplete="on"
                   />
                   {errors?.accountKey && <WarningMessage>{errors.accountKey.message}</WarningMessage>}
                 </LoginInputBox>
@@ -265,6 +266,7 @@ const Contents = () => {
                         message: "영문, 숫자, 특수문자 조합 및 최소 8자 이상이어야 합니다.",
                       },
                     })}
+                    autoComplete="off"
                   />
                   {errors?.password && <WarningMessage>{errors.password.message}</WarningMessage>}
                 </LoginInputBox>
