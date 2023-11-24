@@ -591,6 +591,14 @@ const Contents = () => {
         return;
       }
 
+      if (fileList.length === 0) {
+        setTrademarkError("trademarkFile", {
+          type: "manual",
+          message: "상표 파일을 등록해주세요.",
+        });
+        return;
+      }
+
       params.name = data.trademarkName;
       params.keyword = data.keyword;
       params.detail = data.trademarkDetail;
@@ -637,9 +645,11 @@ const Contents = () => {
           });
         });
         params.fileList = fileData;
+        console.log(params);
         matching(params);
       });
     } else {
+      console.log(params);
       matching(params);
     }
     
@@ -837,6 +847,46 @@ const Contents = () => {
                 {trademarkErrors?.trademarkDetail && (
                   <WarningMessage>{trademarkErrors.trademarkDetail.message}</WarningMessage>
                 )}
+              </InputField>
+
+              <InputField>
+                <label>추가 자료 (최대 5개)</label>
+                <Controller
+                  control={control}
+                  name="trademarkFile"
+                  defaultValue={[]}
+                  render={({ field }) => (
+                    <InputFileBox>
+                      <input
+                        type="file"
+                        id="trademarkFile"
+                        placeholder="상표 파일을 등록해주세요."
+                        multiple
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e); // default onChange from Controller
+                          onChangeFile(e); // your onChange function
+                        }}
+                      />
+                      <label className="file_label" htmlFor="trademarkFile">
+                        상표 파일을 등록해주세요.
+                        <img src={attachFileIcon} alt="file_icon" />
+                      </label>
+                    </InputFileBox>
+                  )}
+                />
+                {trademarkErrors?.trademarkFile && (<WarningMessage>{trademarkErrors.trademarkFile.message}</WarningMessage>)}
+                <FileListBox>
+                  {fileList.map((file, index) => (
+                    <div key={"trademark_file_" + index}>
+                      <img src={fileIcon} className="file_icon" alt="file_icon" />
+                      <span>{file.name}</span>
+                      <button onClick={() => onClickRemoveFile(index)}>
+                        <img src={closeIcon} alt="closeIcon" />
+                      </button>
+                    </div>
+                  ))}
+                </FileListBox>
               </InputField>
 
               <MatchingButton type="submit">매칭 신청하기</MatchingButton>
