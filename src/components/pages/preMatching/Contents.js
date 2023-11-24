@@ -464,10 +464,7 @@ const Contents = () => {
   } = useForm();
 
   const matching = (params) => {
-    console.log(params);
-    preMatchingAPI({
-      ...params,
-    })
+    preMatchingAPI(params)
       .unwrap()
       .then(({ status }) => {
         if (status === "success") {
@@ -481,7 +478,7 @@ const Contents = () => {
           );
         }
       })
-      .then((err) => {
+      .catch((err) => {
         if (err) console.log(`error:${err}`);
       });
   };
@@ -555,7 +552,7 @@ const Contents = () => {
   };
 
   const onSubmit = (data, paramType) => {
-    const params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "", orderId: "" };
+    let params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "", orderId: "", fileList: [] };
 
     if (paramType === "patent") {
       if (subType === null) {
@@ -640,10 +637,12 @@ const Contents = () => {
           });
         });
         params.fileList = fileData;
+        matching(params);
       });
+    } else {
+      matching(params);
     }
-    // console.log(params);
-    matching(params);
+    
   };
 
   return (
