@@ -8,10 +8,10 @@ import attachFileIcon from "../../../assets/images/attach-file.png";
 import closeIcon from "../../../assets/images/close.png";
 import fileIcon from "../../../assets/images/file.png";
 import { Storage } from "../../../modules/Storage";
+import { base64String } from "../../../modules/fileEncoder";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
 import { categoryList } from "./Category";
-import { base64String } from "../../../modules/fileEncoder";
 
 const FieldTitle = styled.h2`
   color: #000000;
@@ -632,10 +632,17 @@ const Contents = () => {
     if (fileList.length > 0) {
       const bs64FileList = fileList.map((file) => base64String(file));
       Promise.all(bs64FileList).then((res) => {
-        // params.fileList = res;
+        let fileData = [];
+        res.forEach((file, index) => {
+          fileData.push({
+            realName: fileList[index].name,
+            base64String: file,
+          });
+        });
+        params.fileList = fileData;
       });
     }
-
+    // console.log(params);
     matching(params);
   };
 
