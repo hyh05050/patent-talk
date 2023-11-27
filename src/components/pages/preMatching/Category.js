@@ -102,19 +102,14 @@ export const categoryList = [
 ];
 
 export const convertCodeToText = (type, depth) => {
+  let result = "기타";
   if (depth === "main") {
-    categoryList.forEach((item) => {
-      if (item.name === type) {
-        return item.title;
-      }
-    });
+    const item = categoryList.find((item) => item.name === type);
+    result = item ? item.title : result;
   } else if (depth === "sub") {
-    patentList.forEach((item) => {
-      if (item.name === type) {
-        return item.title;
-      }
-    });
+    const item = patentList.find((item) => item.name === type);
+    result = item ? item.title : result;
   }
 
-  return "기타";
+  return result;
 };
