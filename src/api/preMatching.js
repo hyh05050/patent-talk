@@ -9,8 +9,12 @@ export const preMatchingApi = createApi({
   reducerPath: "preMatchingApi",
   baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
   endpoints: (builder) => ({
-    getPreMatching: builder.query({
+    getPreMatchingList: builder.query({
       query: (payload) => `/preMatching?orderId=${payload.order_id}`,
+      keepUnusedDataFor: 0,
+    }),
+    getPreMatching: builder.query({
+      query: (payload) => `/preMatching/${payload}`,
       keepUnusedDataFor: 0,
     }),
     addPreMatching: builder.mutation({
@@ -20,4 +24,4 @@ export const preMatchingApi = createApi({
 });
 
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
-export const { useGetPreMatchingQuery, useAddPreMatchingMutation } = preMatchingApi;
+export const { useGetPreMatchingListQuery, useGetPreMatchingQuery, useAddPreMatchingMutation } = preMatchingApi;

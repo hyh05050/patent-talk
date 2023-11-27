@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal, setPreMatchingModal } from "../../../store/slice/modal";
-import { useGetPreMatchingQuery } from "../../../api/preMatching";
+import { useGetPreMatchingListQuery } from "../../../api/preMatching";
 import { convertCodeToText as CTT } from "../preMatching/Category";
 
 const Container = styled.div`
@@ -271,7 +271,7 @@ const Contents = () => {
   const [isLogin] = useState(Storage.get("accountKey") ? true : false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const { data: matchings, isLoading } = useGetPreMatchingQuery({ order_id: Storage.get("accountKey") });
+  const { data: matchings, isLoading } = useGetPreMatchingListQuery({ order_id: Storage.get("accountKey") });
 
   useEffect(() => {
     if (!isLogin) {
@@ -290,12 +290,12 @@ const Contents = () => {
     }
   }, []);
 
-  const onClickMatchingRow = (e, data) => {
+  const onClickMatchingRow = async (e, data) => {
     if (!e.target.classList.contains("download-btn")) {
       dispatch(
         setPreMatchingModal({
           modalState: true,
-          modalData: data,
+          modalData: { preMatchingId: data.preMatchingId },
         })
       );
     }
@@ -381,7 +381,7 @@ const Contents = () => {
 
                   <MatchingBox>
                     {matchings.data?.map((matching, index) => (
-                      <div key={"matching_" + index} className="item">
+                      <div key={"matching_" + index} className="item" onClick={(e) => onClickMatchingRow(e, matching)}>
                         <p>
                           신청일 : <span>{matching.createdAt?.substring(0, 10)}</span>
                         </p>

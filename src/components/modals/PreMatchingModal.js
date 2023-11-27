@@ -5,6 +5,7 @@ import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
 import { setPreMatchingModal } from "../../store/slice/modal";
 import { convertCodeToText as CTT } from "../pages/preMatching/Category";
 import closeIcon from "../../assets/images/close.png";
+import { useGetPreMatchingQuery } from "../../api/preMatching";
 
 const ModalHeader = styled.div`
   display: flex;
@@ -77,11 +78,13 @@ const ModalContents = styled.div`
 const PreMatchingModal = () => {
   const { matching: modal } = useAppSelector(modalSelector);
   const dispatch = useAppDispatch();
+  const { data: matching, isLoading, refetch } = useGetPreMatchingQuery(modal.modalData?.preMatchingId || "0");
 
   useEffect(() => {
     // 모달이 열릴 때 이벤트 처리
     if (modal.modalState) {
       document.body.style.overflow = "hidden";
+      refetch();
     } else {
       document.body.style.overflow = "auto";
     }
@@ -100,6 +103,8 @@ const PreMatchingModal = () => {
     newWindow.document.title = "인디프 추가자료 다운로드";
     newWindow.location.href = fileUrl;
   };
+
+  if (isLoading) return <></>;
 
   return (
     <Modal
@@ -147,38 +152,38 @@ const PreMatchingModal = () => {
         <div className="contents-box">
           <div>
             <p className="contents-subtitle">1. 특허 유형</p>
-            <p className="contents-info">{CTT(modal.modalData?.type, "main")}</p>
+            <p className="contents-info">{CTT(matching?.data?.type, "main")}</p>
           </div>
 
           <div>
             <p className="contents-subtitle">2. 분류</p>
             <p className="contents-info">
-              {modal.modalData?.detailType
-                ? CTT(modal.modalData?.subType, "sub") + "-" + modal.modalData?.detailType
-                : CTT(modal.modalData?.subType, "sub")}
+              {matching?.data?.detailType
+                ? CTT(matching?.data?.subType, "sub") + "-" + matching?.data?.detailType
+                : CTT(matching?.data?.subType, "sub")}
             </p>
           </div>
 
           <div>
             <p className="contents-subtitle">3. 상세 정보</p>
-            <p className="contents-info">{modal.modalData?.detail}</p>
+            <p className="contents-info">{matching?.data?.detail}</p>
           </div>
 
           <div>
             <p className="contents-subtitle">4. 추가 자료</p>
-            <p className="contents-info">
-              <a href="#" onClick={() => onClickDownload(modal.modalData?.fileUrl)}>
-                다운로드 링크
-              </a>
-            </p>
+            {matching?.data?.fileList?.map((file, index) => (
+              <p key={"file_" + file.fileId} className="contents-info">
+                <a href="#" onClick={() => onClickDownload(file?.fileUrl)}>
+                  {file?.realName}
+                </a>
+              </p>
+            ))}
           </div>
 
           <div>
             <p className="contents-subtitle">5. 매칭 결과</p>
             <p className="contents-info">
-              <a href="#" onClick={() => onClickDownload(modal.modalData?.fileUrl)}>
-                매칭 결과
-              </a>
+              <a href="#">매칭 결과</a>
             </p>
           </div>
         </div>

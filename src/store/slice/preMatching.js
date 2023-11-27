@@ -17,21 +17,10 @@ export const preMatchingSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder
-      .addMatcher(
-        (action) => preMatchingApi.endpoints.getPreMatching.matchFulfilled(action),
-        (state, { payload }) => {
-          console.log(payload);
-          if (payload.status === "success") {
-            const { preMatchingId, type, subType, name, keyword, detail, createdAt } = payload.data;
-            state.preMatching = { preMatchingId, type, subType, name, keyword, detail, createdAt };
-          }
-        }
-      )
-      .addMatcher(preMatchingApi.endpoints.addPreMatching.matchFulfilled, (state, { payload }) => {
-        const { preMatchingId, type, subType, name, keyword, detail, createdAt } = payload.data;
-        state.preMatching = { preMatchingId, type, subType, name, keyword, detail, createdAt };
-      });
+    builder.addMatcher(preMatchingApi.endpoints.addPreMatching.matchFulfilled, (state, { payload }) => {
+      const { preMatchingId, type, subType, name, keyword, detail, createdAt } = payload.data;
+      state.preMatching = { preMatchingId, type, subType, name, keyword, detail, createdAt };
+    });
   },
 });
 
