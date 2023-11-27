@@ -6,6 +6,8 @@ import { useForm } from "react-hook-form";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
+import jwtDecode from "jwt-decode";
 
 const LoginPage = styled.div`
   display: flex;
@@ -157,7 +159,18 @@ const LoginButton = styled.button`
   width: 100%;
   height: 52px;
   background-color: #202d90;
-  margin-bottom: 24px;
+  margin-bottom: 12px;
+`;
+
+const GoogleLoginBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  width: 100%;
+  margin-bottom: 12px;
 `;
 
 const LoginLinkBox = styled.div`
@@ -224,6 +237,22 @@ const Contents = () => {
       });
   };
 
+  const onGoogleLoginSuccess = (res) => {
+    const userData = jwtDecode(res.credential);
+    login({
+      accountKey: userData.email,
+      email: userData.email,
+      password: userData.sub,
+      humanName: userData.name,
+      joinType: "google",
+    });
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: (res) => onGoogleLoginSuccess(res),
+    onFailure: (error) => console.log(error),
+  });
+
   const onSubmit = (data) => {
     login(data);
   };
@@ -275,10 +304,21 @@ const Contents = () => {
                   <label htmlFor="remember">로그인 상태 유지</label>
                 </LoginCheckBox> */}
                 <LoginButton type="submit">로그인</LoginButton>
+                <GoogleLoginBox>
+                  <GoogleLogin
+                    onSuccess={(credentialResponse) => {
+                      onGoogleLoginSuccess(credentialResponse);
+                    }}
+                    onError={() => {
+                      console.log("Login Failed");
+                    }}
+                    width={100}
+                  />
+                </GoogleLoginBox>
                 <LoginLinkBox>
                   <Link to={"/join"}>회원가입</Link>
                   {/* <Link to={"#"}>아이디 찾기</Link> */}
-                  <Link to={"#"}>비밀번호 찾기</Link>
+                  {/* <Link to={"#"}>비밀번호 찾기</Link> */}
                 </LoginLinkBox>
               </div>
               {/* <div className="lawyer-login">

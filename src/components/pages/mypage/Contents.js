@@ -354,7 +354,6 @@ const Contents = () => {
                         <th>특허 유형</th>
                         <th>분류</th>
                         <th>상세 정보</th>
-                        <th>추가자료</th>
                         <th>매칭 결과</th>
                       </tr>
                     </thead>
@@ -370,11 +369,6 @@ const Contents = () => {
                               : CTT(matching.subType, "sub")}
                           </td>
                           <td>{matching.detail}</td>
-                          <td>
-                            <button type="button" className="download-btn">
-                              보기
-                            </button>
-                          </td>
                           <td>
                             <button type="button" className="download-btn" onClick={() => navigate("/matching")}>
                               확인
@@ -406,11 +400,6 @@ const Contents = () => {
                           상세 정보 : <span>{matching.detail}</span>
                         </p>
                         <div className="button">
-                          <div>
-                            <button type="button" className="download-btn">
-                              추가 자료
-                            </button>
-                          </div>
                           <div>
                             <button type="button" className="download-btn">
                               매칭 결과
