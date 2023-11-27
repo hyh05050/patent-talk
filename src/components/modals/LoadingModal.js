@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Modal from "react-modal";
+import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
+import { setLoadingModal } from "../../store/slice/modal";
 
 const LoadingModal = () => {
-  const [modal, setModal] = useState({
-    modalState: false,
-  });
+  const { loading: modal } = useAppSelector(modalSelector);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     // 모달이 열릴 때 이벤트 처리
@@ -16,9 +17,7 @@ const LoadingModal = () => {
   }, [modal.modalState]);
 
   const closeModal = () => {
-    setModal({
-      modalState: false,
-    });
+    dispatch(setLoadingModal());
   };
 
   return (

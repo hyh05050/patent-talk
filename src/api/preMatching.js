@@ -11,6 +11,7 @@ export const preMatchingApi = createApi({
   endpoints: (builder) => ({
     getPreMatching: builder.query({
       query: (payload) => `/preMatching?orderId=${payload.order_id}`,
+      keepUnusedDataFor: 0,
     }),
     addPreMatching: builder.mutation({
       query: (payload) => httpObject("/preMatching", "POST", payload),

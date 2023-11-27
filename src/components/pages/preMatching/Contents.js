@@ -10,7 +10,7 @@ import fileIcon from "../../../assets/images/file.png";
 import { Storage } from "../../../modules/Storage";
 import { base64String } from "../../../modules/fileEncoder";
 import { useAppDispatch } from "../../../store";
-import { setAlertModal } from "../../../store/slice/modal";
+import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 import { categoryList } from "./Category";
 
 const FieldTitle = styled.h2`
@@ -464,9 +464,12 @@ const Contents = () => {
   } = useForm();
 
   const matching = (params) => {
+    dispatch(setLoadingModal({ modalState: true }));
+
     preMatchingAPI(params)
       .unwrap()
       .then(({ status }) => {
+        dispatch(setLoadingModal());
         if (status === "success") {
           navigate("/mypage");
         } else {
@@ -552,7 +555,16 @@ const Contents = () => {
   };
 
   const onSubmit = (data, paramType) => {
-    let params = { type: "", subType: "", detailType: "", name: "", keyword: "", detail: "", orderId: "", fileList: [] };
+    let params = {
+      type: "",
+      subType: "",
+      detailType: "",
+      name: "",
+      keyword: "",
+      detail: "",
+      orderId: "",
+      fileList: [],
+    };
 
     if (paramType === "patent") {
       if (subType === null) {
@@ -652,7 +664,6 @@ const Contents = () => {
       console.log(params);
       matching(params);
     }
-    
   };
 
   return (
@@ -875,7 +886,9 @@ const Contents = () => {
                     </InputFileBox>
                   )}
                 />
-                {trademarkErrors?.trademarkFile && (<WarningMessage>{trademarkErrors.trademarkFile.message}</WarningMessage>)}
+                {trademarkErrors?.trademarkFile && (
+                  <WarningMessage>{trademarkErrors.trademarkFile.message}</WarningMessage>
+                )}
                 <FileListBox>
                   {fileList.map((file, index) => (
                     <div key={"trademark_file_" + index}>

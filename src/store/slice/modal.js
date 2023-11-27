@@ -10,6 +10,7 @@ const defaultData = {
 
 const initialState = {
   alert: { ...defaultData },
+  loading: { ...defaultData },
   matching: { ...defaultData },
 };
 
@@ -23,6 +24,15 @@ export const modalSlice = createSlice({
         state.alert = action.payload;
       } else {
         state.alert = {
+          ...defaultData,
+        };
+      }
+    },
+    setLoadingModal: (state, action) => {
+      if (action.payload) {
+        state.loading = action.payload;
+      } else {
+        state.loading = {
           ...defaultData,
         };
       }
@@ -41,6 +51,6 @@ export const modalSlice = createSlice({
 });
 
 // accountSlice의 reducer를 export한다.
-export const { setAlertModal, setPreMatchingModal } = modalSlice.actions;
+export const { setAlertModal, setLoadingModal, setPreMatchingModal } = modalSlice.actions;
 
 export default modalSlice.reducer;
