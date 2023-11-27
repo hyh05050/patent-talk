@@ -415,6 +415,22 @@ const Contents = () => {
   const [preMatchingAPI] = useAddPreMatchingMutation();
   const dispatch = useAppDispatch();
 
+  const [isLogin] = useState(Storage.get("accountKey") ? true : false);
+
+  useEffect(() => {
+    if (!isLogin) {
+      dispatch(
+        setAlertModal({
+          modalState: true,
+          modalData: { title: "로그인이 필요합니다.", message: "로그인 페이지로 이동합니다." },
+          callback: () => {
+            navigate("/login");
+          },
+        })
+      );
+    }
+  }, []);
+
   useEffect(() => {
     if (field) {
       if (categoryList.some((item) => item.name === field)) {

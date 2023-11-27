@@ -41,7 +41,7 @@ const patentList = [
     name: "bm",
     title: "BM",
     icon: PatentIcon,
-    typeList: [],
+    typeList: ["중개업", "광고", "제휴", "커뮤니티", "O2O", "지식서비스", "게임", "플랫폼"],
   },
   {
     name: "others",
