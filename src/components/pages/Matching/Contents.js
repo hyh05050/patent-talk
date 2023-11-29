@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { useAddMatchingMutation } from "../../../api/matching";
 import userIcon from "../../../assets/images/user.png";
-import { useAppDispatch } from "../../../store";
+import { preMatchingSelector, useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
+import { useGetAgentListMutation, useGetQuatationListMutation } from "../../../api/preMatching";
+import { useAppSelector } from "./../../../store/index";
+import { useAddMatchingMutation } from "../../../api/matching";
 
 const Container = styled.div`
   max-width: 768px;
@@ -175,6 +177,14 @@ const Field = styled.div`
         font-size: 14px;
         font-weight: 700;
         cursor: pointer;
+
+        &.disabled {
+          background: #e5ecef;
+          color: #a1a1a1;
+          border: 1px solid #a1a1a1;
+          cursor: not-allowed;
+          pointer-events: none;
+        }
       }
     }
   }
@@ -325,6 +335,7 @@ const Card = styled.div`
 
       div {
         flex: 1 0;
+
         button {
           width: 100%;
           height: 40px;
@@ -335,6 +346,14 @@ const Card = styled.div`
           font-size: 14px;
           font-weight: 700;
           cursor: pointer;
+
+          &.disabled {
+            background: #e5ecef;
+            color: #a1a1a1;
+            border: 1px solid #a1a1a1;
+            cursor: not-allowed;
+            pointer-events: none;
+          }
         }
       }
     }
@@ -355,59 +374,29 @@ const MatchingButton = styled.button`
   cursor: pointer;
 `;
 
-const matchingList = [
-  {
-    id: 1,
-    name: "김특허 변리사",
-    img: userIcon,
-    company: "좋은특허법률사무소",
-    typeList: ["특허", "상표", "디자인", "실용신안"],
-    careerList: ["변리사", "특허전문변리사", "특허심판전문변리사"],
-    expList: ["특허 10년", "특허 100건 이상", "특허심판 10건 이상"],
-    price: "100만원",
-  },
-  {
-    id: 2,
-    name: "김특허 변리사",
-    img: userIcon,
-    company: "좋은특허법률사무소",
-    typeList: ["특허", "상표", "디자인", "실용신안"],
-    careerList: ["변리사", "특허전문변리사", "특허심판전문변리사"],
-    expList: ["특허 10년", "특허 100건 이상", "특허심판 10건 이상"],
-    price: "100만원",
-  },
-  {
-    id: 3,
-    name: "김특허 변리사",
-    img: userIcon,
-    company: "좋은특허법률사무소",
-    typeList: ["특허", "상표", "디자인", "실용신안"],
-    careerList: ["변리사", "특허전문변리사", "특허심판전문변리사"],
-    expList: ["특허 10년", "특허 100건 이상", "특허심판 10건 이상"],
-    price: "100만원",
-  },
-];
-
 const Contents = () => {
   const navigate = useNavigate();
+  const { preMatchingId } = useParams();
   const [proposal, setProposal] = useState("");
-  // const { data: matchings, isLoading } = useGetMatchingQuery({ order_id: Storage.get("accountKey") });
-  const [matchingAPI] = useAddMatchingMutation();
+  const { agentList, quotationList } = useAppSelector(preMatchingSelector);
+  const [agentAPI] = useGetAgentListMutation();
+  const [quotationAPI] = useGetQuatationListMutation();
+  const [addMatchingAPI] = useAddMatchingMutation();
   const dispatch = useAppDispatch();
-  const preMatchingId = new URLSearchParams(window.location.search).get("preMatchingId") ;
-  const matching = (params) => {
-    matchingAPI({
-      ...params,
+
+  const getAgentList = () => {
+    agentAPI({
+      preMatchingId: 80 || preMatchingId,
     })
       .unwrap()
-      .then(({ status }) => {
+      .then(({ status, data }) => {
         if (status === "success") {
-          navigate("/mypage");
+          // console.log(data);
         } else {
           dispatch(
             setAlertModal({
               modalState: true,
-              modalData: { title: "변리사 선택", message: "변리사 선택에 실패하였습니다." },
+              modalData: { title: "제안 선택", message: "매칭 변리사 검색에 실패하였습니다." },
             })
           );
         }
@@ -416,6 +405,57 @@ const Contents = () => {
         if (err) console.log(`error:${err}`);
       });
   };
+
+  const getQuatationList = () => {
+    quotationAPI({
+      preMatchingId: 80 || preMatchingId,
+    })
+      .unwrap()
+      .then(({ status, data }) => {
+        if (status === "success") {
+          // console.log(data);
+        } else {
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "제안 선택", message: "매칭 견적 검색에 실패하였습니다." },
+            })
+          );
+        }
+      })
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
+      });
+  };
+
+  const addMatching = () => {
+    addMatchingAPI({
+      preMatchingId: 80 || proposal.preMatchingId,
+    })
+      .unwrap()
+      .then(({ status, data }) => {
+        if (status === "success") {
+          // console.log(data);
+        } else {
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "제안 선택", message: "매칭 선택에 실패하였습니다." },
+            })
+          );
+        }
+      })
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
+      });
+  };
+
+  useEffect(() => {
+    if (preMatchingId) {
+      getQuatationList();
+      getAgentList();
+    }
+  }, [preMatchingId]);
 
   const onClickProposal = (matching) => {
     setProposal(matching);
@@ -432,7 +472,7 @@ const Contents = () => {
       return;
     }
 
-    matching(proposal);
+    addMatching();
   };
 
   return (
@@ -442,43 +482,51 @@ const Contents = () => {
           <FieldTitle className="animate">제안 선택</FieldTitle>
 
           <FieldBox>
-            {matchingList.map((matching, index) => (
-              <Field key={index} className={proposal?.id === matching.id && "active"}>
+            {agentList?.map((agent, index) => (
+              <Field key={index} className={proposal?.agentNo === agent.agentNo && "active"}>
                 <div className="contents">
                   <div className="attorney_img">
-                    <img src={matching.img} alt="user" />
+                    <img src={userIcon} alt="user" />
                   </div>
                   <div className="attorney_info">
-                    <p className="name">{matching.name}</p>
-                    <p className="company">{matching.company}</p>
-                    <p className="type">{matching.typeList.join(", ")}</p>
+                    <p className="name">{agent.name}</p>
+                    <p className="type">{agent.mainArea}</p>
+                    <p className="company">{agent.email || "-"}</p>
                   </div>
                   <div className="careers">
-                    {matching.careerList.map((career, index) => (
-                      <p className="career" key={index}>
-                        {career}
-                      </p>
-                    ))}
+                    <p className="career">{agent.qualification}</p>
+                    <p className="career">{agent.businessStatus}</p>
+                    <p className="career">-</p>
                   </div>
                   <div className="experience">
-                    {matching.expList.map((exp, index) => (
-                      <p className="exp" key={index}>
-                        {exp}
-                      </p>
-                    ))}
+                    <p className="exp">{agent.subArea1}</p>
+                    <p className="exp">{agent.subArea2}</p>
+                    <p className="exp">{agent.subArea3}</p>
                   </div>
                 </div>
                 <div className="footer">
                   <div className="estimate">
                     <p className="price">
-                      견적가:<span>{matching.price}</span>
+                      견적가 : &nbsp;
+                      <span>
+                        {quotationList
+                          ?.find((quotation) => quotation.agentNo === agent.agentNo)
+                          ?.offerPrice.toLocaleString() || "미정"}
+                      </span>
                     </p>
                   </div>
                   <div className="buttonBox">
                     <button>상세보기</button>
                   </div>
                   <div className="buttonBox">
-                    <button onClick={() => onClickProposal(matching)}>선택</button>
+                    <button
+                      className={
+                        quotationList?.some((quotation) => quotation.agentNo === agent.agentNo) ? "" : "disabled"
+                      }
+                      onClick={() => onClickProposal(agent)}
+                    >
+                      선택
+                    </button>
                   </div>
                 </div>
               </Field>
@@ -486,38 +534,39 @@ const Contents = () => {
           </FieldBox>
 
           <CardBox>
-            {matchingList.map((matching, index) => (
-              <Card key={"matching_" + index} className={proposal?.id === matching.id && "active"}>
+            {agentList.map((agent, index) => (
+              <Card key={"matching_" + index} className={proposal?.agentNo === agent.agentNo && "active"}>
                 <div className="attorney_info">
                   <div className="attorney_img">
-                    <img src={matching.img} alt="user" />
+                    <img src={userIcon} alt="user" />
                   </div>
                   <div>
-                    <p className="name">{matching.name}</p>
-                    <p className="company">{matching.company}</p>
-                    <p className="type">{matching.typeList.join(", ")}</p>
+                    <p className="name">{agent.name}</p>
+                    <p className="type">{agent.mainArea}</p>
+                    <p className="company">{agent.email || "-"}</p>
                   </div>
                 </div>
                 <div className="attorney_detail">
                   <div className="careers">
-                    {matching.careerList.map((career, index) => (
-                      <p className="career" key={index}>
-                        {career}
-                      </p>
-                    ))}
+                    <p className="career">{agent.qualification}</p>
+                    <p className="career">{agent.businessStatus}</p>
+                    <p className="career">-</p>
                   </div>
                   <div className="experience">
-                    {matching.expList.map((exp, index) => (
-                      <p className="exp" key={index}>
-                        {exp}
-                      </p>
-                    ))}
+                    <p className="exp">{agent.subArea1}</p>
+                    <p className="exp">{agent.subArea2}</p>
+                    <p className="exp">{agent.subArea3}</p>
                   </div>
                 </div>
                 <div className="footer">
                   <div className="estimate">
                     <p className="price">
-                      견적가:<span>{matching.price}</span>
+                      견적가 : &nbsp;
+                      <span>
+                        {quotationList
+                          ?.find((quotation) => quotation.agentNo === agent.agentNo)
+                          ?.offerPrice.toLocaleString() || "미정"}
+                      </span>
                     </p>
                   </div>
                   <div className="buttonBox">
@@ -525,7 +574,14 @@ const Contents = () => {
                       <button>상세보기</button>
                     </div>
                     <div>
-                      <button onClick={() => onClickProposal(matching)}>선택</button>
+                      <button
+                        className={
+                          quotationList?.some((quotation) => quotation.agentNo === agent.agentNo) ? "" : "disabled"
+                        }
+                        onClick={() => onClickProposal(agent)}
+                      >
+                        선택
+                      </button>
                     </div>
                   </div>
                 </div>

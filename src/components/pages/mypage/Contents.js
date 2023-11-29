@@ -290,7 +290,7 @@ const Contents = () => {
     }
   }, []);
 
-  const onClickMatchingRow = async (e, data) => {
+  const onClickMatchingRow = (e, data) => {
     if (!e.target.classList.contains("download-btn")) {
       dispatch(
         setPreMatchingModal({
@@ -301,8 +301,14 @@ const Contents = () => {
     }
   };
 
-  if (isLoading) return <div>loading...</div>;
+  const onClickMatchingButton = (data) => {
+    if (data.preMatchingId) {
+      navigate("/matching/" + data.preMatchingId);
+    }
+  };
 
+  if (isLoading) return <div>loading...</div>;
+  console.log(matchings.data);
   return (
     <main style={{ minHeight: "800px", background: "#e5ecef" }}>
       <section>
@@ -370,9 +376,23 @@ const Contents = () => {
                           </td>
                           <td>{matching.detail}</td>
                           <td>
-                            <button type="button" className="download-btn" onClick={() => navigate("/matching")}>
-                              확인
-                            </button>
+                            {matching.managerId ? (
+                              <button
+                                type="button"
+                                className="download-btn"
+                                onClick={() => onClickMatchingButton(matching)}
+                              >
+                                {matching?.managerName} 변리사
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="download-btn"
+                                onClick={() => onClickMatchingButton(matching)}
+                              >
+                                확인
+                              </button>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -401,9 +421,23 @@ const Contents = () => {
                         </p>
                         <div className="button">
                           <div>
-                            <button type="button" className="download-btn">
-                              매칭 결과
-                            </button>
+                            {matching.managerId ? (
+                              <button
+                                type="button"
+                                className="download-btn"
+                                onClick={() => onClickMatchingButton(matching)}
+                              >
+                                {matching?.managerName} 변리사
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="download-btn"
+                                onClick={() => onClickMatchingButton(matching)}
+                              >
+                                매칭 확인
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

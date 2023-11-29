@@ -3,7 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { AuthProvider } from "./components/providers/AuthProvider";
 import ModalProvider from "./components/providers/ModalProvider";
-import MainRouter from "./MainRouter";
+import MainRouter from "./components/router";
 
 const App = () => {
   const queryClient = new QueryClient();

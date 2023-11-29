@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useLoginMutation } from "../../../api/account";
 import { useForm } from "react-hook-form";
@@ -197,7 +197,6 @@ const LoginLinkBox = styled.div`
 `;
 
 const Contents = () => {
-  const navigate = useNavigate();
   const [loginAPI] = useLoginMutation();
   const dispatch = useAppDispatch();
 
@@ -219,7 +218,7 @@ const Contents = () => {
               modalState: true,
               modalData: { title: "로그인", message: "로그인에 성공하였습니다." },
               callback: () => {
-                navigate("/");
+                window.location.href = "/";
               },
             })
           );
