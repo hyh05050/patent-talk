@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useAddMatchingMutation } from "../../../api/matching";
 import userIcon from "../../../assets/images/user.png";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
-import { useAddMatchingMutation, useGetMatchingQuery } from "../../../api/matching";
-import { Storage } from "../../../modules/Storage";
 
 const Container = styled.div`
   max-width: 768px;
@@ -395,7 +394,7 @@ const Contents = () => {
   // const { data: matchings, isLoading } = useGetMatchingQuery({ order_id: Storage.get("accountKey") });
   const [matchingAPI] = useAddMatchingMutation();
   const dispatch = useAppDispatch();
-
+  const preMatchingId = new URLSearchParams(window.location.search).get("preMatchingId") ;
   const matching = (params) => {
     matchingAPI({
       ...params,

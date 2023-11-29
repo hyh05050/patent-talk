@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Modal from "react-modal";
 import styled from "styled-components";
+import { useGetPreMatchingQuery } from "../../api/preMatching";
+import closeIcon from "../../assets/images/close.png";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
 import { setPreMatchingModal } from "../../store/slice/modal";
 import { convertCodeToText as CTT } from "../pages/preMatching/Category";
-import closeIcon from "../../assets/images/close.png";
-import { useGetPreMatchingQuery } from "../../api/preMatching";
 
 const ModalHeader = styled.div`
   display: flex;
@@ -79,7 +79,6 @@ const PreMatchingModal = () => {
   const { matching: modal } = useAppSelector(modalSelector);
   const dispatch = useAppDispatch();
   const { data: matching, isLoading, refetch } = useGetPreMatchingQuery(modal.modalData?.preMatchingId || "0");
-
   useEffect(() => {
     // 모달이 열릴 때 이벤트 처리
     if (modal.modalState) {
@@ -138,7 +137,7 @@ const PreMatchingModal = () => {
     >
       <ModalHeader>
         <div className="header-title">
-          <span>임시출원 정보</span>
+          <span>매칭 신청 정보</span>
         </div>
         <div className="header-close">
           <button onClick={closeModal}>
@@ -148,7 +147,7 @@ const PreMatchingModal = () => {
       </ModalHeader>
 
       <ModalContents>
-        <p className="contents-title">매칭 신청 정보</p>
+        <p className="contents-title">&nbsp;</p>
         <div className="contents-box">
           <div>
             <p className="contents-subtitle">1. 특허 유형</p>
@@ -181,9 +180,9 @@ const PreMatchingModal = () => {
           </div>
 
           <div>
-            <p className="contents-subtitle">5. 매칭 결과</p>
+            <p className="contents-subtitle">5. 매칭 확인</p>
             <p className="contents-info">
-              <a href="#">매칭 결과</a>
+              <a href={"/matching?preMatchingId="+modal?.modalData?.preMatchingId}>확인</a>
             </p>
           </div>
         </div>
