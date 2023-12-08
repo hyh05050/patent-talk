@@ -4,6 +4,7 @@ import { preMatchingApi } from "../../api/preMatching";
 // initialState는 accountSlice의 state의 초기값이다.
 const initialState = {
   preMatching: { preMatchingId: "", type: "", subType: "", name: "", keyword: "", detail: "", createdAt: "" },
+  matching: { preMatchingId: "", type: "", subType: "", name: "", keyword: "", detail: "", createdAt: "" },
   agentList: [],
   quotationList: [],
 };
@@ -31,9 +32,14 @@ export const preMatchingSlice = createSlice({
           state.agentList = payload.data;
         }
       })
-      .addMatcher(preMatchingApi.endpoints.getQuatationList.matchFulfilled, (state, { payload }) => {
+      .addMatcher(preMatchingApi.endpoints.getQuotationList.matchFulfilled, (state, { payload }) => {
         if (payload.status === "success") {
           state.quotationList = payload.data;
+        }
+      })
+      .addMatcher(preMatchingApi.endpoints.addMatching.matchFulfilled, (state, { payload }) => {
+        if (payload.status === "success") {
+          state.matching = payload.data;
         }
       });
   },

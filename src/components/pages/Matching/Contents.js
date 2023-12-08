@@ -4,9 +4,9 @@ import styled from "styled-components";
 import userIcon from "../../../assets/images/user.png";
 import { preMatchingSelector, useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
-import { useGetAgentListMutation, useGetQuatationListMutation } from "../../../api/preMatching";
+import { useGetAgentListMutation, useGetQuotationListMutation } from "../../../api/preMatching";
 import { useAppSelector } from "./../../../store/index";
-import { useAddMatchingMutation } from "../../../api/matching";
+import { useAddMatchingMutation } from "../../../api/preMatching";
 
 const Container = styled.div`
   max-width: 768px;
@@ -380,13 +380,13 @@ const Contents = () => {
   const [proposal, setProposal] = useState("");
   const { agentList, quotationList } = useAppSelector(preMatchingSelector);
   const [agentAPI] = useGetAgentListMutation();
-  const [quotationAPI] = useGetQuatationListMutation();
+  const [quotationAPI] = useGetQuotationListMutation();
   const [addMatchingAPI] = useAddMatchingMutation();
   const dispatch = useAppDispatch();
 
   const getAgentList = () => {
     agentAPI({
-      preMatchingId: 80 || preMatchingId,
+      preMatchingId: preMatchingId,
     })
       .unwrap()
       .then(({ status, data }) => {
@@ -406,9 +406,9 @@ const Contents = () => {
       });
   };
 
-  const getQuatationList = () => {
+  const getQuotationList = () => {
     quotationAPI({
-      preMatchingId: 80 || preMatchingId,
+      preMatchingId: parseInt(preMatchingId),
     })
       .unwrap()
       .then(({ status, data }) => {
@@ -429,13 +429,22 @@ const Contents = () => {
   };
 
   const addMatching = () => {
+    const quotationId = quotationList?.find((quotation) => quotation.agentNo === proposal.agentNo)?.quotationId;
     addMatchingAPI({
-      preMatchingId: 80 || proposal.preMatchingId,
+      quotationId: quotationId,
     })
       .unwrap()
       .then(({ status, data }) => {
         if (status === "success") {
-          // console.log(data);
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "제안 선택", message: "제안을 선택하셨습니다." },
+              callback: () => {
+                navigate("/mypage");
+              },
+            })
+          );
         } else {
           dispatch(
             setAlertModal({
@@ -452,7 +461,7 @@ const Contents = () => {
 
   useEffect(() => {
     if (preMatchingId) {
-      getQuatationList();
+      getQuotationList();
       getAgentList();
     }
   }, [preMatchingId]);

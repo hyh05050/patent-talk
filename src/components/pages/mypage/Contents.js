@@ -307,6 +307,10 @@ const Contents = () => {
     }
   };
 
+  const onClickAttorneyButton = () => {
+    navigate("/chat");
+  };
+
   if (isLoading) return <div>loading...</div>;
   console.log(matchings.data);
   return (
@@ -334,6 +338,7 @@ const Contents = () => {
                 </ul>
               </MyPageMenu>
             </div>
+
             <div className="col-lg-9 col-12">
               <div className="row">
                 <MatchingMenuBox>
@@ -377,11 +382,7 @@ const Contents = () => {
                           <td>{matching.detail}</td>
                           <td>
                             {matching.managerId ? (
-                              <button
-                                type="button"
-                                className="download-btn"
-                                onClick={() => onClickMatchingButton(matching)}
-                              >
+                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
                                 {matching?.managerName} 변리사
                               </button>
                             ) : (
@@ -422,11 +423,7 @@ const Contents = () => {
                         <div className="button">
                           <div>
                             {matching.managerId ? (
-                              <button
-                                type="button"
-                                className="download-btn"
-                                onClick={() => onClickMatchingButton(matching)}
-                              >
+                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
                                 {matching?.managerName} 변리사
                               </button>
                             ) : (

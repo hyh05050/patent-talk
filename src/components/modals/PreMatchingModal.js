@@ -6,6 +6,7 @@ import closeIcon from "../../assets/images/close.png";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
 import { setPreMatchingModal } from "../../store/slice/modal";
 import { convertCodeToText as CTT } from "../pages/preMatching/Category";
+import { Link, useNavigate } from "react-router-dom";
 
 const ModalHeader = styled.div`
   display: flex;
@@ -76,6 +77,7 @@ const ModalContents = styled.div`
 `;
 
 const PreMatchingModal = () => {
+  const navigate = useNavigate();
   const { matching: modal } = useAppSelector(modalSelector);
   const dispatch = useAppDispatch();
   const { data: matching, isLoading, refetch } = useGetPreMatchingQuery(modal.modalData?.preMatchingId || "0");
@@ -101,6 +103,13 @@ const PreMatchingModal = () => {
     const newWindow = window.open();
     newWindow.document.title = "인디프 추가자료 다운로드";
     newWindow.location.href = fileUrl;
+  };
+
+  const onClickMatchingButton = (data) => {
+    if (data.preMatchingId) {
+      closeModal();
+      navigate("/matching/" + data.preMatchingId);
+    }
   };
 
   if (isLoading) return <></>;
@@ -182,7 +191,9 @@ const PreMatchingModal = () => {
           <div>
             <p className="contents-subtitle">5. 매칭 확인</p>
             <p className="contents-info">
-              <a href={"/matching?preMatchingId="+modal?.modalData?.preMatchingId}>확인</a>
+              <a href="#" onClick={() => onClickMatchingButton(matching?.data)}>
+                확인
+              </a>
             </p>
           </div>
         </div>
