@@ -1,12 +1,12 @@
 import React, { useEffect } from "react";
 import Modal from "react-modal";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useGetPreMatchingQuery } from "../../api/preMatching";
 import closeIcon from "../../assets/images/close.png";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
 import { setPreMatchingModal } from "../../store/slice/modal";
 import { convertCodeToText as CTT } from "../pages/preMatching/Category";
-import { Link, useNavigate } from "react-router-dom";
 
 const ModalHeader = styled.div`
   display: flex;
@@ -112,6 +112,11 @@ const PreMatchingModal = () => {
     }
   };
 
+  const onClickAttorneyButton = () => {
+    closeModal();
+    navigate("/chat");
+  };
+
   if (isLoading) return <></>;
 
   return (
@@ -181,7 +186,7 @@ const PreMatchingModal = () => {
             <p className="contents-subtitle">4. 추가 자료</p>
             {matching?.data?.fileList?.map((file, index) => (
               <p key={"file_" + file.fileId} className="contents-info">
-                <a href="#" onClick={() => onClickDownload(file?.fileUrl)}>
+                <a href="" onClick={() => onClickDownload(file?.fileUrl)}>
                   {file?.realName}
                 </a>
               </p>
@@ -191,9 +196,15 @@ const PreMatchingModal = () => {
           <div>
             <p className="contents-subtitle">5. 매칭 확인</p>
             <p className="contents-info">
-              <a href="#" onClick={() => onClickMatchingButton(matching?.data)}>
-                확인
+              {matching?.data?.managerId ? (
+              <a href="" onClick={() => onClickAttorneyButton(matching?.data)}>
+                매칭 완료 (변리사와 연결)
+              </a>) : (
+                <a href="" onClick={() => onClickMatchingButton(matching?.data)}>
+                  매칭 신청 완료 (견적 확인하기)
               </a>
+              )
+              }
             </p>
           </div>
         </div>

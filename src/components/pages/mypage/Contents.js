@@ -317,7 +317,8 @@ const Contents = () => {
   };
 
   if (isLoading) return <div>loading...</div>;
-  console.log(matchings.data);
+  
+  let displayedData = matchings.data?.filter((matching)=>matching.status == activeStatus).slice(0).reverse();
   return (
     <main style={{ minHeight: "800px", background: "#e5ecef" }}>
       <section>
@@ -389,34 +390,35 @@ const Contents = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {matchings.data?.filter((matching)=>matching.status == activeStatus).map((matching, index) => (
-                        <tr key={"matching_" + matching.preMatchingId} onClick={(e) => onClickMatchingRow(e, matching)}>
-                          <td>{index + 1}</td>
-                          <td>{matching.createdAt?.substring(0, 10)}</td>
-                          <td>{CTT(matching.type, "main")}</td>
-                          <td>
-                            {matching.detailType
-                              ? CTT(matching.subType, "sub") + "-" + matching.detailType
-                              : CTT(matching.subType, "sub")}
-                          </td>
-                          <td>{matching.detail}</td>
-                          <td>
-                            {matching.managerId ? (
-                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
-                                {matching?.managerName} 변리사
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                className="download-btn"
-                                onClick={() => onClickMatchingButton(matching)}
-                              >
-                                확인
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
+                      {displayedData.length != 0 ? displayedData.map((matching, index) => {
+                        return (
+                          <tr key={"matching_" + matching.preMatchingId} onClick={(e) => onClickMatchingRow(e, matching)}>
+                            <td>{displayedData.length - index}</td>
+                            <td>{matching.createdAt?.substring(0, 10)}</td>
+                            <td>{CTT(matching.type, "main")}</td>
+                            <td>
+                              {matching.detailType
+                                ? CTT(matching.subType, "sub") + "-" + matching.detailType
+                                : CTT(matching.subType, "sub")}
+                            </td>
+                            <td>{matching.detail}</td>
+                            <td>
+                              {matching.managerId ? (
+                                <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
+                                  {matching?.managerName} 변리사
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="download-btn"
+                                  onClick={() => onClickMatchingButton(matching)}
+                                >
+                                  확인
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        )}) : <tr><td colSpan="6">조회된 내역이 없습니다.</td></tr>}
                     </tbody>
                   </MatchingTable>
 
