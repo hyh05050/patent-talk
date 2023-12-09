@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import { useGetPreMatchingListQuery } from "../../../api/preMatching";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal, setPreMatchingModal } from "../../../store/slice/modal";
-import { useGetPreMatchingListQuery } from "../../../api/preMatching";
 import { convertCodeToText as CTT } from "../preMatching/Category";
 
 const Container = styled.div`
@@ -268,6 +268,7 @@ const MatchingBox = styled.div`
 const Contents = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const [activeStatus, setActiveStatus] = useState("Not Matched Yet");
   const [isLogin] = useState(Storage.get("accountKey") ? true : false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -289,6 +290,10 @@ const Contents = () => {
       setEmail(Storage.get("accountKey"));
     }
   }, []);
+
+  const onClickMenu = (status) => {
+    setActiveStatus(status);
+  };
 
   const onClickMatchingRow = (e, data) => {
     if (!e.target.classList.contains("download-btn")) {
@@ -342,15 +347,30 @@ const Contents = () => {
             <div className="col-lg-9 col-12">
               <div className="row">
                 <MatchingMenuBox>
-                  <MatchingMenu className="col active">
+                  <MatchingMenu className={`col ${activeStatus === "Not Matched Yet" ? "active" : "" }`}
+                    onClick={()=> onClickMenu("Not Matched Yet")}>
                     <p className="title">매칭 신청 내역</p>
                     <p className="info">
-                      {matchings.data?.length}
+                      {matchings.data?.filter((matching) => matching.status == "Not Matched Yet").length}
                       <span>건</span>
                     </p>
                   </MatchingMenu>
-                  <MatchingMenu className="col no_content" />
-                  <MatchingMenu className="col no_content d-none d-md-block" />
+                  <MatchingMenu className={`col ${activeStatus === "Matched" ? "active" : "" }`}
+                    onClick={()=>onClickMenu("Matched")}>
+                    <p className="title">진행 중 내역</p>
+                    <p className="info">
+                      {matchings.data?.filter((matching) => matching.status == "Matched").length}
+                      <span>건</span>
+                    </p>
+                  </MatchingMenu>
+                  <MatchingMenu className={`col ${activeStatus === "Done" ? "active" : "" }`}
+                    onClick={()=>onClickMenu("Done")}>
+                    <p className="title">완료 내역</p>
+                    <p className="info">
+                      {matchings.data?.filter((matching) => matching.status == "Done").length}
+                      <span>건</span>
+                    </p>
+                  </MatchingMenu>
                   <MatchingMenu className="col no_content d-none d-md-block" />
                 </MatchingMenuBox>
               </div>
@@ -369,7 +389,7 @@ const Contents = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {matchings.data?.map((matching, index) => (
+                      {matchings.data?.filter((matching)=>matching.status == activeStatus).map((matching, index) => (
                         <tr key={"matching_" + matching.preMatchingId} onClick={(e) => onClickMatchingRow(e, matching)}>
                           <td>{index + 1}</td>
                           <td>{matching.createdAt?.substring(0, 10)}</td>
