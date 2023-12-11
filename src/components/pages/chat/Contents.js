@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Storage } from "../../../modules/Storage";
 import userImg from "../../../assets/images/user.png";
 import SearchIcon from "@mui/icons-material/Search";
 import fileIcon from "../../../assets/images/file.png";
+import { writedAtFormat, dateFormat, timeFormat, compareDate, getTodayTime } from "../../../modules/dateFormat";
+import { ChatListData, ChatContentsData } from "./DummyList";
+import { io } from "socket.io-client";
 
 const Container = styled.div`
   padding: 120px 0;
@@ -530,177 +533,50 @@ const YourMessage = styled.div`
   }
 `;
 
-const ChatListData = [
-  {
-    id: 1,
-    userImg: userImg,
-    userName: "김특허1 변리사",
-    writedAt: "2023.12.04 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 2,
-    userImg: userImg,
-    userName: "김특허2 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 3,
-    userImg: userImg,
-    userName: "김특허3 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 4,
-    userImg: userImg,
-    userName: "김특허4 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 5,
-    userImg: userImg,
-    userName: "김특허5 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 6,
-    userImg: userImg,
-    userName: "김특허6 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 7,
-    userImg: userImg,
-    userName: "김특허6 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-  {
-    id: 8,
-    userImg: userImg,
-    userName: "김특허6 변리사",
-    writedAt: "2021.09.01 14:14",
-    msg: "안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요안녕하세요",
-    file: "생활-기타 : 식물 자동 급수를 위한 장치와 그 방법",
-  },
-];
-
-const ChatContentsData = [
-  {
-    id: 1,
-    userImg: userImg,
-    userName: "나",
-    writedAt: "2023.12.04 14:14",
-    msg: "안녕하세요. 식물 자동 급수를 위한 특허를 준비하고 있습니다.",
-  },
-  {
-    id: 2,
-    userImg: userImg,
-    userName: "나",
-    writedAt: "2023.12.04 14:14",
-    msg: "기존에 보낸 자료는 보셨나요",
-  },
-  {
-    id: 3,
-    userImg: userImg,
-    userName: "김특허1 변리사",
-    writedAt: "2023.12.04 14:14",
-    msg: "안녕하세요",
-  },
-  {
-    id: 4,
-    userImg: userImg,
-    userName: "김특허1 변리사",
-    writedAt: "2023.12.04 14:14",
-    msg: "자료 확인했습니다.",
-  },
-  {
-    id: 5,
-    userImg: userImg,
-    userName: "김특허1 변리사",
-    writedAt: "2023.12.04 14:14",
-    msg: "감사합니다.",
-  },
-];
-
 const Contents = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-
-  const filteredData = ChatListData.filter((item) => item.userName.toLowerCase().includes(searchTerm.toLowerCase()));
+  const [chatListArr, setChatListArr] = useState(
+    ChatListData.filter((item) => item.userName.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+  const [chatArr, setChatArr] = useState(ChatContentsData);
+  const inputRef = useRef(null);
+  const socket = useRef();
 
   useEffect(() => {
     setUserName(Storage.get("humanName"));
     setEmail(Storage.get("accountKey"));
+
+    socket.current = io("http://localhost:3001", {
+      cors: {
+        origin: "*",
+      },
+    });
+
+    socket.current.on("receive", (message) => {
+      setChatArr((prevChatArr) => [...prevChatArr, message]);
+    });
+
+    return () => {
+      socket.current.disconnect();
+    };
   }, []);
 
-  const writedAtFormat = (date) => {
-    //date가 오늘날짜면 시간만 표시, 아니면 날짜만 표시
-    const targetDate = new Date(date);
-    const today = new Date();
-    const year = targetDate.getFullYear();
-    const month = targetDate.getMonth() + 1;
-    const day = targetDate.getDate();
+  const handleSend = () => {
+    const message = {
+      id: 6,
+      userImg: userImg,
+      userName: "나",
+      writedAt: getTodayTime(),
+      msg: inputRef.current.value,
+    };
 
-    if (today.getFullYear() === year && today.getMonth() + 1 === month && today.getDate() === day) {
-      //오늘날짜 일때 시간만 표시 ex) 02:30 pm
-      return timeFormat(date);
-    } else {
-      return `${year}.${month}.${day}`;
-    }
-  };
+    // Send the message
+    socket.current.emit("send", message);
 
-  const dateFormat = (date) => {
-    const targetDate = new Date(date);
-    const year = targetDate.getFullYear();
-    const month = targetDate.getMonth() + 1;
-    const day = targetDate.getDate();
-
-    //요일 구하기
-    const week = new Array("일", "월", "화", "수", "목", "금", "토");
-    const dayOfWeek = week[targetDate.getDay()];
-
-    return `${year}년 ${month}월 ${day}일 ${dayOfWeek}요일`;
-  };
-
-  const timeFormat = (date) => {
-    const targetDate = new Date(date);
-    const hour = targetDate.getHours();
-    const minute = targetDate.getMinutes();
-
-    const ampm = hour >= 12 ? "pm" : "am";
-    const hour12 = hour % 12 ? hour % 12 : 12;
-    const hour12Format = hour12 < 10 ? "0" + hour12 : hour12;
-    const minuteFormat = minute < 10 ? "0" + minute : minute;
-    return `${hour12Format}:${minuteFormat} ${ampm}`;
-  };
-
-  const compareDate = (prev, next) => {
-    const prevDate = new Date(prev);
-    const nextDate = new Date(next);
-
-    if (
-      prevDate.getFullYear() === nextDate.getFullYear() &&
-      prevDate.getMonth() === nextDate.getMonth() &&
-      prevDate.getDate() === nextDate.getDate()
-    ) {
-      return true;
-    } else {
-      return false;
-    }
+    // Clear the input field
+    inputRef.current.value = "";
   };
 
   return (
@@ -743,13 +619,13 @@ const Contents = () => {
 
                 <div className="chatInfo">
                   <p>
-                    채팅 <span>{filteredData?.length}</span>
+                    채팅 <span>{chatListArr?.length}</span>
                   </p>
                 </div>
 
-                <ChatList className={filteredData?.length > 8 ? "existScroll" : ""}>
-                  {filteredData.map((item, index) => (
-                    <ChatItem>
+                <ChatList className={chatListArr?.length > 8 ? "existScroll" : ""}>
+                  {chatListArr.map((item, index) => (
+                    <ChatItem key={index}>
                       <div className="userImg">
                         <img src={item.userImg} alt="변리사이미지" />
                       </div>
@@ -781,8 +657,8 @@ const Contents = () => {
 
                 <div className="contents">
                   <ChatContents>
-                    {ChatContentsData.map((item, index) => {
-                      const prevItem = ChatContentsData[index - 1];
+                    {chatArr.map((item, index) => {
+                      const prevItem = chatArr[index - 1];
                       const prevCheck = prevItem && prevItem.userName === item.userName;
                       const isSameTime = prevCheck && prevItem.writedAt === item.writedAt;
                       const isSameDate = compareDate(prevItem?.writedAt, item.writedAt);
@@ -791,7 +667,7 @@ const Contents = () => {
                         <>
                           {!isSameDate && <div className="date">{dateFormat(item.writedAt)}</div>}
                           {item.userName === "나" ? (
-                            <MyMessage className={isSameTime ? "minutes" : ""}>
+                            <MyMessage className={isSameTime ? "minutes" : ""} key={index}>
                               <div className="message">
                                 {!isSameTime && (
                                   <div className="title">
@@ -805,7 +681,7 @@ const Contents = () => {
                               </div>
                             </MyMessage>
                           ) : (
-                            <YourMessage className={isSameTime ? "minutes" : ""}>
+                            <YourMessage className={isSameTime ? "minutes" : ""} key={index}>
                               <div className="userImage">{!isSameTime && <img src={item.userImg} alt="" />}</div>
                               <div className="message">
                                 {!isSameTime && (
@@ -829,10 +705,10 @@ const Contents = () => {
                 <div className="inputBox">
                   <div className="chat">
                     <img src={fileIcon} alt="파일 등록" />
-                    <input type="text" placeholder="메시지를 입력하세요" />
+                    <input type="text" placeholder="메시지를 입력하세요" ref={inputRef} />
                   </div>
                   <div className="sendButton">
-                    <button>보내기</button>
+                    <button onClick={handleSend}>보내기</button>
                   </div>
                 </div>
               </ChatContentsBox>
