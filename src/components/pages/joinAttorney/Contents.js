@@ -212,6 +212,26 @@ const JoinButton = styled.button`
   }
 `;
 
+const CheckAgentNoBtn = styled.button`
+font-size: 16px;
+font-weight: 700;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
+color: #fff;
+letter-spacing: 0px;
+line-height: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+flex-direction: row;
+flex-wrap: wrap;
+width: 100%;
+height: 52px;
+background-color: #202d90;
+margin-top: 12px;
+margin-bottom: 24px;
+`;
+
 const Contents = () => {
   const navigate = useNavigate();
   const [joinAPI] = useJoinMutation();
@@ -232,7 +252,7 @@ const Contents = () => {
   const join = (accountInfo) => {
     joinAPI({
       ...accountInfo,
-      roles: "client",
+      roles: "attorney",
     })
       .unwrap()
       .then(({ status }) => {
@@ -301,6 +321,11 @@ const Contents = () => {
     } catch (error) {}
   };
 
+  const checkAgentNo = () => {
+    console.log("checkAgentNo");
+    console.log(getValues("agentNo"));
+  };
+
   return (
     <main>
       <section>
@@ -308,7 +333,7 @@ const Contents = () => {
           <JoinPage>
             <JoinPageDiv>
               <div className="container">
-                <JoinTitle>이메일 회원가입</JoinTitle>
+                <JoinTitle>변리사 회원가입</JoinTitle>
                 <JoinInputBox>
                   <label htmlFor="email">이메일</label>
                   <input
@@ -364,6 +389,64 @@ const Contents = () => {
                   />
                   {errors?.password_check && <WarningMessage>{errors.password_check.message}</WarningMessage>}
                 </JoinInputBox>
+                <JoinInputBox>
+                  <label htmlFor="agentNo">대리인 번호</label>
+                  <input
+                    type="text"
+                    id="agentNo"
+                    placeholder="대리인 번호"
+                    {...register("agentNo", {
+                      required: "대리인 번호를 입력해주세요.",
+                    })}
+                  />
+                </JoinInputBox>
+                <CheckAgentNoBtn type="button" onClick={checkAgentNo} >
+                  대리인 번호 확인
+                </CheckAgentNoBtn>
+                <JoinInputBox>
+                  <label htmlFor="mainArea">주 분야</label>
+                  <input
+                    type="text"
+                    id="mainArea"
+                    placeholder="주 분야"
+                    {...register("mainArea", {
+                      required: "주 분야를 입력해주세요.",
+                    })}
+                  />
+                </JoinInputBox>
+                <JoinInputBox>
+                  <label htmlFor="subArea1">부 분야 1</label>
+                  <input
+                    type="text"
+                    id="subArea1"
+                    placeholder="부 분야 1"
+                    {...register("subArea1", {
+                      required: "부 분야 1을 입력해주세요.",
+                    })}
+                  />
+                </JoinInputBox>
+                <JoinInputBox>
+                  <label htmlFor="subArea2">부 분야 2</label>
+                  <input
+                    type="text"
+                    id="subArea2"
+                    placeholder="부 분야 2"
+                    {...register("subArea2", {
+                      required: "부 분야 2를 입력해주세요.",
+                    })}
+                  />
+                </JoinInputBox>
+                <JoinInputBox>
+                  <label htmlFor="subArea3">부 분야 3</label>
+                  <input
+                    type="text"
+                    id="subArea3"
+                    placeholder="부 분야 3"
+                    {...register("subArea3", {
+                      required: "부 분야 3을 입력해주세요.",
+                    })}
+                  />
+                </JoinInputBox>
                 <JoinPolicyBox>
                   <PolicyAllCheckBox>
                     <input type="checkbox" id="policy" {...register("policyAll")} onChange={handleSelectAll} />
@@ -416,9 +499,9 @@ const Contents = () => {
                 <JoinLinkBox>
                   <Link to={"/login"}>이미 가입했다면?</Link>
                 </JoinLinkBox>
-                <JoinLinkBox>
+                {/* <JoinLinkBox>
                   <Link to={"/joinAttorney"}>변리사 이신가요?</Link>
-                </JoinLinkBox>
+                </JoinLinkBox> */}
                 <JoinButton type="submit" disabled={!isChecked} className={!isChecked && "disabled"}>
                   회원가입
                 </JoinButton>
