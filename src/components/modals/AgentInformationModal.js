@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Modal from "react-modal";
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import closeIcon from "../../assets/images/close.png";
-import { convertCodeToText as CTT } from "../pages/preMatching/Category";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
-import { useSelector } from "react-redux";
 import { setAgentInformationModal } from "../../store/slice/modal";
-import { getAgentInfoByAgentName } from "../../api/agent";
 
 const ModalHeader = styled.div`
   display: flex;
@@ -88,7 +84,6 @@ const AgentInformationModal = () => {
 
 
   useEffect(() => {
-    console.log("selectedAgent", modal?.modalData?.selectedAgent);
     // 모달이 열릴 때 이벤트 처리
     if (modal?.modalState) {
       document.body.style.overflow = "hidden";

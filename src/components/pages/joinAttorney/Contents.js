@@ -3,10 +3,9 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
-import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
-import modal, { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
 import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/agent";
-import { useSelector } from "react-redux";
+import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
+import { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
 
 const JoinPage = styled.div`
   display: flex;
@@ -326,13 +325,9 @@ const Contents = () => {
   };
 
   const checkByAgentName = () => {
-    console.log("checkAgentName");
-    console.log(getValues("humanName"));
     getAgentInfoByAgentName(getValues("humanName"))
       .then((res) => {
-        console.log("getAgentInfoByAgentName");
         const agentInfo = res.data.data;
-        console.log(agentInfo);
         if(agentInfo === null){
           dispatch(
             setAlertModal({
@@ -342,7 +337,6 @@ const Contents = () => {
           );
         } else {
           if(agentInfo.length === 0){
-            console.log("agentInfo.length === 0");
             dispatch(
               setAlertModal({
                 modalState: true,
@@ -350,14 +344,24 @@ const Contents = () => {
               })
             );
           } else if (agentInfo.length === 1) {
-            console.log("agentInfo.length === 1");
             setValue("agentNo", agentInfo[0].agentNo);
             setValue("mainArea", agentInfo[0].mainArea);
             setValue("subArea1", agentInfo[0].subArea1);
             setValue("subArea2", agentInfo[0].subArea2);
             setValue("subArea3", agentInfo[0].subArea3);
+            alert(`대리인 정보가 선택되었습니다. 본인의 정보가 맞는지 확인해주세요.
+이 름 : ${agentInfo[0].name}
+생 년 : ${agentInfo[0].birth}
+자 격 : ${agentInfo[0].qualification}
+${agentInfo[0].officeName}
+${agentInfo[0].businessStatus}
+대리인번호 : ${agentInfo[0].agentNo}
+주분야 : ${agentInfo[0].mainArea}
+부분야1 : ${agentInfo[0].subArea1}
+부분야2 : ${agentInfo[0].subArea2}
+부분야3 : ${agentInfo[0].subArea3}
+`);
           } else if (agentInfo.length > 1) {
-            console.log("agentInfo.length > 1");
             dispatch(
               setAgentInformationModal({
                 modalState: true,
@@ -370,7 +374,6 @@ const Contents = () => {
   }
 
   useEffect(() => {
-    console.log("selectedAgent", modal?.modalData?.selectedAgent);
     if (modal?.modalData?.selectedAgent) {
       const selected = modal?.modalData?.selectedAgent;
       setValue("agentNo", selected.agentNo);
@@ -394,11 +397,8 @@ ${selected.businessStatus}
   }, [modal?.modalData?.selectedAgent]);
 
   const checkByAgentNo = () => {
-    console.log("checkAgentNo");
-    console.log(getValues("agentNo"));
     getAgentInfoByAgentNo(getValues("agentNo"))
       .then((res) => {
-        console.log("getAgentInfoByAgentNo");
         const agentInfo = res.data.data;
         if(agentInfo === null){
           dispatch(
@@ -424,7 +424,6 @@ ${selected.businessStatus}
         }
       })
       .catch((err) => {
-        console.log("getAgentInfoByAgentNo Error");
         console.log(err);
       });
 
