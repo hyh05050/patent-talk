@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
-import { useAppDispatch } from "../../../store";
-import { setAlertModal } from "../../../store/slice/modal";
+import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
+import modal, { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
+import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/agent";
+import { useSelector } from "react-redux";
 
 const JoinPage = styled.div`
   display: flex;
@@ -212,7 +214,7 @@ const JoinButton = styled.button`
   }
 `;
 
-const CheckAgentNoBtn = styled.button`
+const CheckInformationBtn = styled.button`
 font-size: 16px;
 font-weight: 700;
 -webkit-font-smoothing: antialiased;
@@ -239,6 +241,7 @@ const Contents = () => {
   const policyList = requiredPolicy.concat(["policy4"]);
   const [isChecked, setChecked] = useState(false);
   const dispatch = useAppDispatch();
+  const {agentInformation: modal} = useAppSelector(modalSelector);
 
   const {
     register,
@@ -279,6 +282,7 @@ const Contents = () => {
         if (err) console.log(`error:${err}`);
       });
   };
+
 
   const handleSelectAll = (e) => {
     if (e.currentTarget.checked) {
@@ -321,9 +325,109 @@ const Contents = () => {
     } catch (error) {}
   };
 
-  const checkAgentNo = () => {
+  const checkByAgentName = () => {
+    console.log("checkAgentName");
+    console.log(getValues("humanName"));
+    getAgentInfoByAgentName(getValues("humanName"))
+      .then((res) => {
+        console.log("getAgentInfoByAgentName");
+        const agentInfo = res.data.data;
+        console.log(agentInfo);
+        if(agentInfo === null){
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "대리인 정보", message: "대리인 정보가 존재하지 않습니다." },
+            })
+          );
+        } else {
+          if(agentInfo.length === 0){
+            console.log("agentInfo.length === 0");
+            dispatch(
+              setAlertModal({
+                modalState: true,
+                modalData: { title: "대리인 정보", message: "대리인 정보가 존재하지 않습니다." },
+              })
+            );
+          } else if (agentInfo.length === 1) {
+            console.log("agentInfo.length === 1");
+            setValue("agentNo", agentInfo[0].agentNo);
+            setValue("mainArea", agentInfo[0].mainArea);
+            setValue("subArea1", agentInfo[0].subArea1);
+            setValue("subArea2", agentInfo[0].subArea2);
+            setValue("subArea3", agentInfo[0].subArea3);
+          } else if (agentInfo.length > 1) {
+            console.log("agentInfo.length > 1");
+            dispatch(
+              setAgentInformationModal({
+                modalState: true,
+                modalData: { title: "대리인 정보", message: "대리인 정보가 여러개 존재합니다.", agentList: agentInfo },
+              })
+            );
+          }
+        }
+      });
+  }
+
+  useEffect(() => {
+    console.log("selectedAgent", modal?.modalData?.selectedAgent);
+    if (modal?.modalData?.selectedAgent) {
+      const selected = modal?.modalData?.selectedAgent;
+      setValue("agentNo", selected.agentNo);
+      setValue("mainArea", selected.mainArea);
+      setValue("subArea1", selected.subArea1);
+      setValue("subArea2", selected.subArea2);
+      setValue("subArea3", selected.subArea3);
+      alert(`대리인 정보가 선택되었습니다. 본인의 정보가 맞는지 확인해주세요.
+이 름 : ${selected.name}
+생 년 : ${selected.birth}
+자 격 : ${selected.qualification}
+${selected.officeName}
+${selected.businessStatus}
+대리인번호 : ${selected.agentNo}
+주분야 : ${selected.mainArea}
+부분야1 : ${selected.subArea1}
+부분야2 : ${selected.subArea2}
+부분야3 : ${selected.subArea3}
+`);
+    }
+  }, [modal?.modalData?.selectedAgent]);
+
+  const checkByAgentNo = () => {
     console.log("checkAgentNo");
     console.log(getValues("agentNo"));
+    getAgentInfoByAgentNo(getValues("agentNo"))
+      .then((res) => {
+        console.log("getAgentInfoByAgentNo");
+        const agentInfo = res.data.data;
+        if(agentInfo === null){
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "대리인 번호", message: "대리인 번호가 존재하지 않습니다." },
+            })
+          );
+        } else {
+          if(agentInfo.length === 0){
+            dispatch(
+              setAlertModal({
+                modalState: true,
+                modalData: { title: "대리인 번호", message: "대리인 번호가 존재하지 않습니다." },
+              })
+            );
+          } else if (agentInfo.length === 1) {
+            setValue("mainArea", agentInfo[0].mainArea);
+            setValue("subArea1", agentInfo[0].subArea1);
+            setValue("subArea2", agentInfo[0].subArea2);
+            setValue("subArea3", agentInfo[0].subArea3);
+          }
+        }
+      })
+      .catch((err) => {
+        console.log("getAgentInfoByAgentNo Error");
+        console.log(err);
+      });
+
   };
 
   return (
@@ -363,6 +467,9 @@ const Contents = () => {
                   />
                   {errors?.humanName && <WarningMessage>{errors.humanName.message}</WarningMessage>}
                 </JoinInputBox>
+                <CheckInformationBtn type="button" onClick={checkByAgentName} >
+                    이름으로 대리인 번호 확인
+                </CheckInformationBtn>
                 <JoinInputBox>
                   <label htmlFor="password">비밀번호</label>
                   <input
@@ -400,9 +507,9 @@ const Contents = () => {
                     })}
                   />
                 </JoinInputBox>
-                <CheckAgentNoBtn type="button" onClick={checkAgentNo} >
+                <CheckInformationBtn type="button" onClick={checkByAgentNo} >
                   대리인 번호 확인
-                </CheckAgentNoBtn>
+                </CheckInformationBtn>
                 <JoinInputBox>
                   <label htmlFor="mainArea">주 분야</label>
                   <input

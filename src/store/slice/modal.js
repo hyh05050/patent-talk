@@ -47,10 +47,20 @@ export const modalSlice = createSlice({
         };
       }
     },
+
+    setAgentInformationModal: (state, action) => {
+      if (action.payload) {
+        state.agentInformation = action.payload;
+      } else {
+        state.agentInformation = {
+          ...defaultData,
+        };
+      }
+    },
   },
 });
 
 // accountSlice의 reducer를 export한다.
-export const { setAlertModal, setLoadingModal, setPreMatchingModal } = modalSlice.actions;
+export const { setAlertModal, setLoadingModal, setPreMatchingModal, setAgentInformationModal } = modalSlice.actions;
 
 export default modalSlice.reducer;
