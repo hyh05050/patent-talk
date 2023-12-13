@@ -156,7 +156,9 @@ const AgentInformationModal = () => {
             <p className="contents-subtitle">조회 결과</p>
             {agentInformation?.map((agent, index) => (
               <div key={"agent_" + index} className="agent-info" onClick={setAgentInformation(agent)}>
-                <p className="contents-info">{agent.name}</p>
+                <p className="contents-info">이 름 : {agent.name}</p>
+                <p className="contents-info">생 년 : {agent.birth}</p>
+                <p className="contents-info">자 격 : {agent.qualification}</p>
               </div>
             ))
             }

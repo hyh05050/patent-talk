@@ -1,13 +1,13 @@
+import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
+import jwtDecode from "jwt-decode";
 import React from "react";
+import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { useLoginMutation } from "../../../api/account";
-import { useForm } from "react-hook-form";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
-import { GoogleLogin, useGoogleLogin } from "@react-oauth/google";
-import jwtDecode from "jwt-decode";
 
 const LoginPage = styled.div`
   display: flex;
@@ -316,6 +316,11 @@ const Contents = () => {
                 </GoogleLoginBox>
                 <LoginLinkBox>
                   <Link to={"/join"}>회원가입</Link>
+                  {/* <Link to={"#"}>아이디 찾기</Link> */}
+                  {/* <Link to={"#"}>비밀번호 찾기</Link> */}
+                </LoginLinkBox>
+                <LoginLinkBox>
+                  <Link to={"/joinAttorney"}>변리사 회원가입</Link>
                   {/* <Link to={"#"}>아이디 찾기</Link> */}
                   {/* <Link to={"#"}>비밀번호 찾기</Link> */}
                 </LoginLinkBox>
