@@ -1,11 +1,13 @@
 import React from "react";
+import "../../assets/scss/modal.scss";
+import AgentInformationModal from "../modals/AgentInformationModal";
+import AlertModal from "../modals/AlertModal";
 import LoadingModal from "../modals/LoadingModal";
+import PreMatchingModal from "../modals/PreMatchingModal";
+import QuotationDetailModal from "../modals/QuotationDetailModal";
+import QuotationModal from "../modals/QuotationModal";
 import RightMenuModal from "../modals/RightMenuModal";
 import SimpleRightModal from "../modals/SimpleRightModal";
-import AlertModal from "../modals/AlertModal";
-import PreMatchingModal from "../modals/PreMatchingModal";
-import AgentInformationModal from "../modals/AgentInformationModal";
-import "../../assets/scss/modal.scss";
 
 const ModalProvider = () => {
   return (
@@ -16,6 +18,8 @@ const ModalProvider = () => {
       <SimpleRightModal />
       <PreMatchingModal />
       <AgentInformationModal />
+      <QuotationModal />
+      <QuotationDetailModal />
     </>
   );
 };

@@ -1,13 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { Storage } from "../../../modules/Storage";
-import userImg from "../../../assets/images/user.png";
 import SearchIcon from "@mui/icons-material/Search";
+import React, { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+import styled from "styled-components";
 import fileIcon from "../../../assets/images/file.png";
-import { writedAtFormat, dateFormat, timeFormat, compareDate, getTodayTime } from "../../../modules/dateFormat";
-import { ChatListData, ChatContentsData } from "./DummyList";
-import { io } from "socket.io-client";
+import userImg from "../../../assets/images/user.png";
+import { Storage } from "../../../modules/Storage";
+import { compareDate, dateFormat, getTodayTime, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
+import { ChatContentsData, ChatListData } from "./DummyList";
 
 const Container = styled.div`
   padding: 120px 0;
@@ -532,7 +531,7 @@ const YourMessage = styled.div`
     }
   }
 `;
-
+const socket = new WebSocket("ws://localhost:8084/socket/chat");
 const Contents = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
@@ -542,26 +541,35 @@ const Contents = () => {
   );
   const [chatArr, setChatArr] = useState(ChatContentsData);
   const inputRef = useRef(null);
-  const socket = useRef();
+  // const socket = useRef();
 
   useEffect(() => {
     setUserName(Storage.get("humanName"));
     setEmail(Storage.get("accountKey"));
 
-    socket.current = io("http://localhost:3001", {
-      cors: {
-        origin: "*",
-      },
-    });
+    socket.onopen = () => {
+      console.log("connected to " + socket.url);
+    };
 
-    socket.current.on("receive", (message) => {
-      setChatArr((prevChatArr) => [...prevChatArr, message]);
-    });
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      console.log(data);
+      if(data.type === "session"){
+        console.log("session id : " + data.sessionId);
+      } else {
+        console.log("got some message: ", data);
+      }
+    };
+
+    socket.onclose = () => {
+      console.log("disconnected");
+    };
 
     return () => {
-      socket.current.disconnect();
+      socket.close();
     };
-  }, []);
+
+  }, [socket]);
 
   const handleSend = () => {
     const message = {
@@ -569,11 +577,15 @@ const Contents = () => {
       userImg: userImg,
       userName: "나",
       writedAt: getTodayTime(),
-      msg: inputRef.current.value,
+      msgContents: inputRef.current.value,
+      chatRoomId: 17, //for test
+      msgFrom: "35",//for test
     };
 
+    socket.send(JSON.stringify(message));
+
     // Send the message
-    socket.current.emit("send", message);
+    // socket.current.emit("send", message);
 
     // Clear the input field
     inputRef.current.value = "";

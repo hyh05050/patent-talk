@@ -13,6 +13,14 @@ export const preMatchingApi = createApi({
       query: (payload) => `/preMatching?orderId=${payload.order_id}`,
       keepUnusedDataFor: 0,
     }),
+    getPreMatchingListSchTxt: builder.query({
+      query: (payload) => `/preMatching?schTxt=${payload.schTxt}`,
+      keepUnusedDataFor: 0,
+    }),
+    getPreMatchingListAID: builder.query({
+      query: (payload) => `/preMatching/attorney/${payload.agentNo}`,
+      keepUnusedDataFor: 0,
+    }),
     getPreMatching: builder.query({
       query: (payload) => `/preMatching/${payload}`,
       keepUnusedDataFor: 0,
@@ -35,6 +43,8 @@ export const preMatchingApi = createApi({
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
 export const {
   useGetPreMatchingListQuery,
+  useGetPreMatchingListSchTxtQuery,
+  useGetPreMatchingListAIDQuery,
   useGetPreMatchingQuery,
   useAddPreMatchingMutation,
   useGetAgentListMutation,

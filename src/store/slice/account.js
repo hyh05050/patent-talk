@@ -26,8 +26,8 @@ export const accountSlice = createSlice({
         (state, { payload }) => {
           console.log(payload);
           if (payload.status === "success") {
-            const { accountKey, password, humanName, role } = payload.data;
-            state.account = { accountKey, password, humanName, role };
+            const { accountKey, password, humanName, roles } = payload.data;
+            state.account = { accountKey, password, humanName, roles };
           }
         },
       );

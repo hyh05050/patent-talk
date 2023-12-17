@@ -1,6 +1,5 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { BASE_URL } from "./config";
 import axios from "axios";
+import { BASE_URL } from "./config";
 
 export const getAgentInfoByAgentNo = async (agentNo) => {
   // let config = {
@@ -15,3 +14,14 @@ export const getAgentInfoByAgentNo = async (agentNo) => {
 export const getAgentInfoByAgentName = async (agentName) => {
   return await axios.get(BASE_URL + "/agent/agentName/" + agentName);
 }
+
+export const getQuotationByPreMatchingNoAndAgentNo = async (preMatchingId, agentNo) => {
+  return await axios.post(BASE_URL + "/preMatching/quotation/", {
+    preMatchingId: preMatchingId,
+    agentNo: agentNo
+  });
+}
+
+export const sendQuotation = async (data) => {
+  return await axios.post(BASE_URL + "/preMatching/sendQuotation", data);
+};
