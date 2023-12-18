@@ -2,11 +2,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { getChatRoomDetail, getChatRoomListByAttorneyId, getChatRoomListByClientId } from "../../../api/axiosApi";
 import fileIcon from "../../../assets/images/file.png";
 import userImg from "../../../assets/images/user.png";
 import { Storage } from "../../../modules/Storage";
-import { ChatContentsData } from "./DummyList";
+import { useGetChatByRoomIdMutation, useGetChatByRoomIdQuery, useGetChatRoomListQuery } from "../../../api/chat";
+import { getChatRoomDetail } from "../../../api/axiosApi";
+import { compareDate, dateFormat, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
 
 const Container = styled.div`
   padding: 120px 0;
@@ -174,16 +175,10 @@ const ChatList = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: flex-start;
   width: 100%;
 
-  max-height: fit-content;
-  overflow-y: scroll;
-
-  &.existScroll {
-    padding-top: 50px;
-  }
+  overflow: auto;
 `;
 
 const ChatItem = styled.div`
@@ -387,18 +382,22 @@ const ChatContents = styled.div`
   padding: 30px;
 
   height: 666px;
-  overflow-y: scroll;
+  overflow: auto;
 
-  & > div.date {
+  & > div {
     width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    color: var(--service-easytask-co-kr-client-chats-1920-x-1080-default-pale-sky, #6c737c);
-    font-size: 14px;
-    line-height: 21px;
-    margin-bottom: 20px;
+
+    div.date {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      color: var(--service-easytask-co-kr-client-chats-1920-x-1080-default-pale-sky, #6c737c);
+      font-size: 14px;
+      line-height: 21px;
+      margin-bottom: 20px;
+    }
   }
 `;
 
@@ -538,16 +537,27 @@ const Contents = () => {
   const [userName, setUserName] = useState(Storage.get("humanName"));
   const [email, setEmail] = useState(Storage.get("accountKey"));
   const [searchTerm, setSearchTerm] = useState("");
-  const [chatListArr, setChatListArr] = useState(null);
   const [socketId, setSocketId] = useState(null);
-  //   ChatListData.filter((item) => item.userName.toLowerCase().includes(searchTerm.toLowerCase()))
-  // );
-  const [chatArr, setChatArr] = useState(ChatContentsData);
+
+  const [chats, setChats] = useState(null);
   const inputRef = useRef(null);
+  const scrollRef = useRef(null);
   const accountId = Storage.get("accountId");
   const role = Storage.get("role") === "client" ? "client" : "attorney";
-  const [currentChatRoomId, setCurrentChatRoomId] = useState(null);
-  const [currentChatDetail, setCurrentChatDetail] = useState(null);
+  const { data: rooms, isLoading } = useGetChatRoomListQuery(
+    role === "client" ? `getChatRoomClient?clientId=${accountId}` : `getChatRoomAttorney?attorneyId=${accountId}`
+  );
+  const [chatApi] = useGetChatByRoomIdMutation();
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      const scrollHeight = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollHeight;
+    }
+
+    window.scrollTo(0, 30);
+  }, [chats]);
+
   useEffect(() => {
     socket.onopen = () => {
       console.log("connected to " + socket.url);
@@ -556,12 +566,14 @@ const Contents = () => {
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       // console.log(data);
-      if(data.type === "session"){
+      if (data.type === "session") {
         console.log("session id : " + data.sessionId);
         setSocketId(data.sessionId);
-      } else if(data.type === "chat") {
+      } else if (data.type === "chat") {
+        data.createdAt = "2023-12-18 21:21:21";
+        data.id = new Date().getTime();
         console.log("chat message : " + JSON.stringify(data));
-        setChatArr((prev) => [...prev, data]);
+        setChats((prev) => [...prev, data]);
       } else {
         console.log("got some message: ", data);
       }
@@ -569,51 +581,44 @@ const Contents = () => {
     socket.onclose = () => {
       console.log("disconnected");
     };
-
   }, []);
 
   useEffect(() => {
-    if(role === "client"){
-      getChatRoomListByClientId(accountId).then((res) => {
-        console.log(res.data);
-        setChatListArr(res.data.data);
-      });
-    } else {
-      getChatRoomListByAttorneyId(accountId).then((res) => {
-        console.log(res.data);
-        setChatListArr(res.data.data);
-      });
+    if (rooms && rooms.length > 0) {
+      updateSocketId(rooms[0].id, accountId, socketId);
+      onClickRoom(rooms[0].id);
     }
-    return () => {
-      socket.close();
-    };
+  }, [rooms]);
 
-  }, []);
-
-  useEffect(() => {
-    console.log(chatListArr);
-    if(chatListArr != null && chatListArr.length > 0){
-      updateSocketId(chatListArr[0].id, accountId, socketId);
-      setCurrentChatRoomId(chatListArr[0].id);
-    }
-  }, [chatListArr]);
-
-  useEffect(() => {
-    if(currentChatRoomId != null){
-      getChatRoomDetail(currentChatRoomId, 10, 0).then((res) => {
-        console.log(res.data);
-        setCurrentChatDetail(res.data.data);
+  const onClickRoom = (roomId) => {
+    chatApi({ roomId: roomId, listCount: 10, skipCount: 0 })
+      .unwrap()
+      .then(({ status, data: chat }) => {
+        if (status === "success") {
+          if (chat && chat.length > 0) {
+            const sortedChat = [...chat].reverse();
+            console.log("chat list : ", sortedChat);
+            setChats(sortedChat);
+          }
+        }
+      })
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
       });
-    }
-  }, [currentChatRoomId]);
+  };
 
   const handleSend = () => {
+    if (!chats || chats[0]?.chatRoomId === null) {
+      alert("채팅방을 선택해주세요.");
+      return;
+    }
+
     const message = {
       msgContents: inputRef.current.value,
-      chatRoomId: currentChatRoomId, //for test
-      msgFrom: accountId,//for test
+      chatRoomId: chats[0]?.chatRoomId, //for test
+      msgFrom: accountId, //for test
       role: role,
-      socketId : socketId,
+      socketId: socketId,
       type: "chat",
     };
 
@@ -629,6 +634,7 @@ const Contents = () => {
   };
 
   const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
+    console.log("mySocketId : ", mySocketId);
     const message = {
       type: "updateSocketId",
       chatRoomId: chatRoomId,
@@ -638,7 +644,9 @@ const Contents = () => {
     };
 
     socket.send(JSON.stringify(message));
-  }
+  };
+
+  if (isLoading) return <div>로딩중...</div>;
 
   return (
     <main style={{ background: "#e5ecef" }}>
@@ -680,28 +688,28 @@ const Contents = () => {
 
                 <div className="chatInfo">
                   <p>
-                    채팅 <span>{chatListArr?.length}</span>
+                    채팅 <span>{rooms?.data?.length}</span>
                   </p>
                 </div>
 
-                <ChatList className={chatListArr?.length > 8 ? "existScroll" : ""}>
-                  {/* {chatListArr.map((item, index) => (
-                    <ChatItem key={index}>
+                <ChatList className={rooms?.data?.length > 8 ? "existScroll" : ""}>
+                  {rooms?.data?.map((room, index) => (
+                    <ChatItem key={"room_" + room.id} onClick={() => onClickRoom(room.id)}>
                       <div className="userImg">
-                        <img src={item.userImg} alt="변리사이미지" />
+                        <img src={room?.userImg ? room?.userImg : userImg} alt="변리사이미지" />
                       </div>
                       <div className="userInfo">
                         <div className="title">
-                          <div className="name">{item.userName}</div>
-                          <div className="writedAt">{writedAtFormat(item.writedAt)}</div>
+                          <div className="name">{room?.userName}</div>
+                          <div className="writedAt">{writedAtFormat(room?.updatedAt)}</div>
                         </div>
                         <div className="contents">
-                          <div className="msg">{item.msg}</div>
-                          <div className="file">{item.file}</div>
+                          <div className="msg">{room?.lastMsg}</div>
+                          <div className="file">{room?.file}</div>
                         </div>
                       </div>
                     </ChatItem>
-                  ))} */}
+                  ))}
                 </ChatList>
               </ChatListBox>
 
@@ -717,49 +725,52 @@ const Contents = () => {
                 </div>
 
                 <div className="contents">
-                  <ChatContents>
-                    {/* {chatArr.map((item, index) => {
-                      const prevItem = chatArr[index - 1];
-                      const prevCheck = prevItem && prevItem.userName === item.userName;
-                      const isSameTime = prevCheck && prevItem.writedAt === item.writedAt;
-                      const isSameDate = compareDate(prevItem?.writedAt, item.writedAt);
+                  <ChatContents ref={scrollRef}>
+                    {chats?.map((chat, index) => {
+                      const prevChat = chats[index - 1];
+                      const prevCheck = prevChat && prevChat.msgFrom === chat.msgFrom;
+                      const isSameDate = compareDate(prevChat?.createdAt, chat.createdAt);
+                      const isSameTime =
+                        prevCheck && isSameDate && timeFormat(prevChat.createdAt) === timeFormat(chat.createdAt);
 
                       return (
-                        <>
-                          {!isSameDate && <div className="date">{dateFormat(item.writedAt)}</div>}
-                          {item.userName === "나" ? (
-                            <MyMessage className={isSameTime ? "minutes" : ""} key={index}>
+                        <div key={"chat_" + chat.id}>
+                          {!isSameDate && <div className="date">{dateFormat(chat?.createdAt)}</div>}
+                          {chat?.msgFrom === accountId ? (
+                            <MyMessage className={isSameTime ? "minutes" : ""}>
                               <div className="message">
                                 {!isSameTime && (
                                   <div className="title">
-                                    <div className="writedAt">{timeFormat(item.writedAt)}</div>
-                                    <div className="name">{item.userName}</div>
+                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
+                                    <div className="name">나</div>
                                   </div>
                                 )}
                                 <div className="contents">
-                                  <div className="msgBox">{item.msg}</div>
+                                  <div className="msgBox">{chat?.msgContents}</div>
                                 </div>
                               </div>
                             </MyMessage>
                           ) : (
                             <YourMessage className={isSameTime ? "minutes" : ""} key={index}>
-                              <div className="userImage">{!isSameTime && <img src={item.userImg} alt="" />}</div>
+                              <div className="userImage">
+                                {!isSameTime && <img src={chat?.userImg ? chat?.userImg : userImg} alt="" />}
+                              </div>
                               <div className="message">
                                 {!isSameTime && (
                                   <div className="title">
-                                    <div className="name">{item.userName}</div>
-                                    <div className="writedAt">{timeFormat(item.writedAt)}</div>
+                                    <div className="name">{chat?.userName ? chat?.userName : "상대"}</div>
+                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
                                   </div>
                                 )}
                                 <div className="contents">
-                                  <div className="msgBox">{item.msg}</div>
+                                  <div className="msgBox">{chat?.msgContents}</div>
                                 </div>
                               </div>
                             </YourMessage>
                           )}
-                        </>
+                        </div>
                       );
-                    })} */}
+                    })}
                   </ChatContents>
                 </div>
 

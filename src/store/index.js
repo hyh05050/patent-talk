@@ -3,25 +3,29 @@ import { configureStore } from "@reduxjs/toolkit";
 import { combineReducers } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
 import account from "./slice/account";
-import attorney from "./slice/attorney";
+import agent from "./slice/agent";
 import modal from "./slice/modal";
 import preMatching from "./slice/preMatching";
 import matching from "./slice/matching";
+import chat from "./slice/chat";
 import { accountApi } from "../api/account";
-import { attorneyApi } from "../api/attorney";
+import { agentApi } from "../api/agent";
 import { preMatchingApi } from "../api/preMatching";
 import { matchingApi } from "../api/matching";
+import { chatApi } from "../api/chat";
 
 const rootReducer = combineReducers({
   account,
-  attorney,
+  agent,
   modal,
   preMatching,
   matching,
+  chat,
   [accountApi.reducerPath]: accountApi.reducer,
-  [attorneyApi.reducerPath]: attorneyApi.reducer,
+  [agentApi.reducerPath]: agentApi.reducer,
   [preMatchingApi.reducerPath]: preMatchingApi.reducer,
   [matchingApi.reducerPath]: matchingApi.reducer,
+  [chatApi.reducerPath]: chatApi.reducer,
 });
 
 export const store = configureStore({
@@ -34,9 +38,10 @@ export const store = configureStore({
       },
     })
       .concat(accountApi.middleware)
-      .concat(attorneyApi.middleware)
+      .concat(agentApi.middleware)
       .concat(preMatchingApi.middleware)
-      .concat(matchingApi.middleware),
+      .concat(matchingApi.middleware)
+      .concat(chatApi.middleware),
 });
 
 setupListeners(store.dispatch);
@@ -48,3 +53,5 @@ export const modalSelector = (state) => state.modal;
 export const accountSelector = (state) => state.account;
 export const preMatchingSelector = (state) => state.preMatching;
 export const matchingSelector = (state) => state.matching;
+export const agentSelector = (state) => state.agent;
+export const chatSelector = (state) => state.chat;

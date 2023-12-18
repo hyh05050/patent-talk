@@ -10,7 +10,7 @@ const Mypage = () => {
   return (
     <>
       <Header />
-      {role.includes("attorney") ? <AttorneyContents /> : <Contents />}
+      {role?.includes("attorney") ? <AttorneyContents /> : <Contents />}
       <Footer />
     </>
   );

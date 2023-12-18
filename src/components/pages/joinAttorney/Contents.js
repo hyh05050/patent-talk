@@ -6,6 +6,7 @@ import { useJoinMutation } from "../../../api/account";
 import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
 import { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
+import { useGetAgentInfoMutation } from "../../../api/agent";
 
 const JoinPage = styled.div`
   display: flex;
@@ -214,23 +215,23 @@ const JoinButton = styled.button`
 `;
 
 const CheckInformationBtn = styled.button`
-font-size: 16px;
-font-weight: 700;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-color: #fff;
-letter-spacing: 0px;
-line-height: 20px;
-display: flex;
-align-items: center;
-justify-content: center;
-flex-direction: row;
-flex-wrap: wrap;
-width: 100%;
-height: 52px;
-background-color: #202d90;
-margin-top: 12px;
-margin-bottom: 24px;
+  font-size: 16px;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #fff;
+  letter-spacing: 0px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 52px;
+  background-color: #202d90;
+  margin-top: 12px;
+  margin-bottom: 24px;
 `;
 
 const Contents = () => {
@@ -241,7 +242,8 @@ const Contents = () => {
   const [isChecked, setChecked] = useState(false);
   const [duplicateCheck, setDuplicateCheck] = useState(false);
   const dispatch = useAppDispatch();
-  const {agentInformation: modal} = useAppSelector(modalSelector);
+  const { agentInformation: modal } = useAppSelector(modalSelector);
+  const [agentApi] = useGetAgentInfoMutation();
 
   const {
     register,
@@ -283,7 +285,6 @@ const Contents = () => {
       });
   };
 
-
   const handleSelectAll = (e) => {
     if (e.currentTarget.checked) {
       policyList.map((policy) => setValue(`${policy}`, true));
@@ -309,7 +310,7 @@ const Contents = () => {
 
   const onSubmit = (data) => {
     console.log("onSubmit");
-    if(!duplicateCheck){
+    if (!duplicateCheck) {
       dispatch(
         setAlertModal({
           modalState: true,
@@ -334,148 +335,142 @@ const Contents = () => {
     } catch (error) {}
   };
 
+  const setAgentInfo = (setFg, agentInfo) => {
+    if (setFg) {
+      setValue("agentNo", agentInfo.agentNo);
+      setValue("mainArea", agentInfo.mainArea);
+      setValue("subArea1", agentInfo.subArea1);
+      setValue("subArea2", agentInfo.subArea2);
+      setValue("subArea3", agentInfo.subArea3);
+    }
+
+    alert(`대리인 정보가 선택되었습니다. 본인의 정보가 맞는지 확인해주세요.
+      이 름 : ${agentInfo.name}
+      생 년 : ${agentInfo.birth}
+      자 격 : ${agentInfo.qualification}
+      ${agentInfo.officeName}
+      ${agentInfo.businessStatus}
+      대리인번호 : ${agentInfo.agentNo}
+      주분야 : ${agentInfo.mainArea}
+      부분야1 : ${agentInfo.subArea1}
+      부분야2 : ${agentInfo.subArea2}
+      부분야3 : ${agentInfo.subArea3}
+    `);
+  };
+
   const checkByAgentName = () => {
-    getAgentInfoByAgentName(getValues("humanName"))
-      .then((res) => {
-        const agentInfo = res.data.data;
-        if(agentInfo === null){
-          dispatch(
-            setAlertModal({
-              modalState: true,
-              modalData: { title: "대리인 정보", message: "대리인 정보가 존재하지 않습니다." },
-            })
-          );
-        } else {
-          if(agentInfo.length === 0){
+    agentApi(`agentName/${getValues("humanName")}`)
+      .unwrap()
+      .then(({ status, data: agentInfo }) => {
+        if (status === "success") {
+          if (agentInfo === null || agentInfo.length === 0) {
             dispatch(
               setAlertModal({
                 modalState: true,
                 modalData: { title: "대리인 정보", message: "대리인 정보가 존재하지 않습니다." },
               })
             );
-          } else if (agentInfo.length === 1) {
-            setValue("agentNo", agentInfo[0].agentNo);
-            setValue("mainArea", agentInfo[0].mainArea);
-            setValue("subArea1", agentInfo[0].subArea1);
-            setValue("subArea2", agentInfo[0].subArea2);
-            setValue("subArea3", agentInfo[0].subArea3);
-            alert(`대리인 정보가 선택되었습니다. 본인의 정보가 맞는지 확인해주세요.
-이 름 : ${agentInfo[0].name}
-생 년 : ${agentInfo[0].birth}
-자 격 : ${agentInfo[0].qualification}
-${agentInfo[0].officeName}
-${agentInfo[0].businessStatus}
-대리인번호 : ${agentInfo[0].agentNo}
-주분야 : ${agentInfo[0].mainArea}
-부분야1 : ${agentInfo[0].subArea1}
-부분야2 : ${agentInfo[0].subArea2}
-부분야3 : ${agentInfo[0].subArea3}
-`);
-          } else if (agentInfo.length > 1) {
+            return;
+          }
+
+          if (agentInfo.length === 1) {
+            setAgentInfo(true, agentInfo[0]);
+
+            return;
+          }
+
+          if (agentInfo.length > 1) {
             dispatch(
               setAgentInformationModal({
                 modalState: true,
                 modalData: { title: "대리인 정보", message: "대리인 정보가 여러개 존재합니다.", agentList: agentInfo },
               })
             );
+            return;
           }
+        } else {
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "대리인 정보", message: "대리인 정보 조회에 실패하였습니다." },
+            })
+          );
         }
+      })
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
       });
-  }
+  };
 
   useEffect(() => {
     return () => {
-      dispatch(setAgentInformationModal({modalState: false, modalData: null}));
-    }
+      dispatch(setAgentInformationModal({ modalState: false, modalData: null }));
+    };
   }, []);
 
   useEffect(() => {
     if (modal?.modalData?.selectedAgent) {
       const selected = modal?.modalData?.selectedAgent;
-      setValue("agentNo", selected.agentNo);
-      setValue("mainArea", selected.mainArea);
-      setValue("subArea1", selected.subArea1);
-      setValue("subArea2", selected.subArea2);
-      setValue("subArea3", selected.subArea3);
-      alert(`대리인 정보가 선택되었습니다. 본인의 정보가 맞는지 확인해주세요.
-이 름 : ${selected.name}
-생 년 : ${selected.birth}
-자 격 : ${selected.qualification}
-${selected.officeName}
-${selected.businessStatus}
-대리인번호 : ${selected.agentNo}
-주분야 : ${selected.mainArea}
-부분야1 : ${selected.subArea1}
-부분야2 : ${selected.subArea2}
-부분야3 : ${selected.subArea3}
-`);
+      setAgentInfo(true, selected);
     }
   }, [modal?.modalData?.selectedAgent]);
 
   const checkByAgentNo = () => {
-    getAgentInfoByAgentNo(getValues("agentNo"))
-      .then((res) => {
-        const agentInfo = res.data.data;
-        if(res.data.status === "success"){
-          if(agentInfo === null){
+    agentApi(`agentNo/${getValues("agentNo")}`)
+      .unwrap()
+      .then(({ status, data: agentInfo }) => {
+        if (status === "success") {
+          if (agentInfo === null || agentInfo.length === 0) {
             setDuplicateCheck(false);
             dispatch(
               setAlertModal({
                 modalState: true,
-                modalData: { title: "대리인 번호", message: "대리인 번호가 존재하지 않습니다." },
+                modalData: { title: "대리인 정보", message: "대리인 정보가 존재하지 않습니다." },
               })
             );
-          } else {
-            if(agentInfo.length === 0){
+            return;
+          }
+
+          if (agentInfo.length === 1) {
+            if (agentInfo[0].name !== getValues("humanName")) {
               setDuplicateCheck(false);
               dispatch(
                 setAlertModal({
                   modalState: true,
-                  modalData: { title: "대리인 번호", message: "대리인 번호가 존재하지 않습니다." },
+                  modalData: { title: "대리인 번호", message: "대리인 번호와 이름이 일치하지 않습니다." },
                 })
               );
-            } else if (agentInfo.length === 1) {
-              if(agentInfo[0].name !== getValues("humanName")){
-                setDuplicateCheck(false);
-                dispatch(
-                  setAlertModal({
-                    modalState: true,
-                    modalData: { title: "대리인 번호", message: "대리인 번호와 이름이 일치하지 않습니다." },
-                  })
-                );
-              } else {
-                setDuplicateCheck(true);
-                alert(`대리인 정보가 확인 되었습니다. 본인의 정보가 맞는지 확인해주세요.
-이 름 : ${agentInfo[0].name}
-생 년 : ${agentInfo[0].birth}
-자 격 : ${agentInfo[0].qualification}
-${agentInfo[0].officeName}
-${agentInfo[0].businessStatus}
-대리인번호 : ${agentInfo[0].agentNo}
-주분야 : ${agentInfo[0].mainArea}
-부분야1 : ${agentInfo[0].subArea1}
-부분야2 : ${agentInfo[0].subArea2}
-부분야3 : ${agentInfo[0].subArea3}
-`);
-              }
+              return;
             }
+
+            setDuplicateCheck(true);
+            setAgentInfo(false, agentInfo);
+
+            return;
           }
         } else {
           setDuplicateCheck(false);
-          if(res.data.message === "이미 등록된 변리사입니다.") {
+          if (agentInfo.message === "이미 등록된 변리사입니다.") {
             dispatch(
               setAlertModal({
                 modalState: true,
                 modalData: { title: "대리인 번호", message: "이미 등록된 변리사입니다.\n관리자에게 문의하세요." },
               })
             );
+            return;
           }
+
+          dispatch(
+            setAlertModal({
+              modalState: true,
+              modalData: { title: "대리인 정보", message: "대리인 정보 조회에 실패하였습니다." },
+            })
+          );
         }
       })
-      .catch((err) => {
-        console.log(err);
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
       });
-
   };
 
   return (
@@ -516,8 +511,8 @@ ${agentInfo[0].businessStatus}
                   />
                   {errors?.humanName && <WarningMessage>{errors.humanName.message}</WarningMessage>}
                 </JoinInputBox>
-                <CheckInformationBtn type="button" onClick={checkByAgentName} >
-                    이름으로 대리인 번호 확인
+                <CheckInformationBtn type="button" onClick={checkByAgentName}>
+                  이름으로 대리인 번호 확인
                 </CheckInformationBtn>
                 <JoinInputBox>
                   <label htmlFor="password">비밀번호</label>
@@ -532,6 +527,7 @@ ${agentInfo[0].businessStatus}
                         message: "영문, 숫자, 특수문자 조합 및 최소 8자 이상이어야 합니다.",
                       },
                     })}
+                    autoComplete="off"
                   />
                   {errors?.password && <WarningMessage>{errors.password.message}</WarningMessage>}
                 </JoinInputBox>
@@ -542,6 +538,7 @@ ${agentInfo[0].businessStatus}
                     id="password_check"
                     placeholder="비밀번호 확인"
                     {...register("password_check")}
+                    autoComplete="off"
                   />
                   {errors?.password_check && <WarningMessage>{errors.password_check.message}</WarningMessage>}
                 </JoinInputBox>
@@ -557,7 +554,7 @@ ${agentInfo[0].businessStatus}
                     })}
                   />
                 </JoinInputBox>
-                <CheckInformationBtn type="button" onClick={checkByAgentNo} >
+                <CheckInformationBtn type="button" onClick={checkByAgentNo}>
                   대리인 번호 확인
                 </CheckInformationBtn>
                 <JoinInputBox>
