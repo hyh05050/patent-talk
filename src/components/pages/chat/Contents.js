@@ -2,11 +2,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { getChatRoomDetail, getChatRoomListByAttorneyId, getChatRoomListByClientId } from "../../../api/axiosApi";
 import fileIcon from "../../../assets/images/file.png";
 import userImg from "../../../assets/images/user.png";
 import { Storage } from "../../../modules/Storage";
-import { compareDate, dateFormat, getTodayTime, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
-import { ChatContentsData, ChatListData } from "./DummyList";
+import { ChatContentsData } from "./DummyList";
 
 const Container = styled.div`
   padding: 120px 0;
@@ -531,56 +531,92 @@ const YourMessage = styled.div`
     }
   }
 `;
-const socket = new WebSocket("ws://localhost:8084/socket/chat");
+
+const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
 const Contents = () => {
-  const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState(Storage.get("humanName"));
+  const [email, setEmail] = useState(Storage.get("accountKey"));
   const [searchTerm, setSearchTerm] = useState("");
-  const [chatListArr, setChatListArr] = useState(
-    ChatListData.filter((item) => item.userName.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const [chatListArr, setChatListArr] = useState(null);
+  const [socketId, setSocketId] = useState(null);
+  //   ChatListData.filter((item) => item.userName.toLowerCase().includes(searchTerm.toLowerCase()))
+  // );
   const [chatArr, setChatArr] = useState(ChatContentsData);
   const inputRef = useRef(null);
-  // const socket = useRef();
-
+  const accountId = Storage.get("accountId");
+  const role = Storage.get("role") === "client" ? "client" : "attorney";
+  const [currentChatRoomId, setCurrentChatRoomId] = useState(null);
+  const [currentChatDetail, setCurrentChatDetail] = useState(null);
   useEffect(() => {
-    setUserName(Storage.get("humanName"));
-    setEmail(Storage.get("accountKey"));
-
     socket.onopen = () => {
       console.log("connected to " + socket.url);
+      // updateSocketId(2, accountId, socketId);  //chatRoomId : 2 for test
     };
-
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      console.log(data);
+      // console.log(data);
       if(data.type === "session"){
         console.log("session id : " + data.sessionId);
+        setSocketId(data.sessionId);
+      } else if(data.type === "chat") {
+        console.log("chat message : " + JSON.stringify(data));
+        setChatArr((prev) => [...prev, data]);
       } else {
         console.log("got some message: ", data);
       }
     };
-
     socket.onclose = () => {
       console.log("disconnected");
     };
 
+  }, []);
+
+  useEffect(() => {
+    if(role === "client"){
+      getChatRoomListByClientId(accountId).then((res) => {
+        console.log(res.data);
+        setChatListArr(res.data.data);
+      });
+    } else {
+      getChatRoomListByAttorneyId(accountId).then((res) => {
+        console.log(res.data);
+        setChatListArr(res.data.data);
+      });
+    }
     return () => {
       socket.close();
     };
 
-  }, [socket]);
+  }, []);
+
+  useEffect(() => {
+    console.log(chatListArr);
+    if(chatListArr != null && chatListArr.length > 0){
+      updateSocketId(chatListArr[0].id, accountId, socketId);
+      setCurrentChatRoomId(chatListArr[0].id);
+    }
+  }, [chatListArr]);
+
+  useEffect(() => {
+    if(currentChatRoomId != null){
+      getChatRoomDetail(currentChatRoomId, 10, 0).then((res) => {
+        console.log(res.data);
+        setCurrentChatDetail(res.data.data);
+      });
+    }
+  }, [currentChatRoomId]);
 
   const handleSend = () => {
     const message = {
-      id: 6,
-      userImg: userImg,
-      userName: "나",
-      writedAt: getTodayTime(),
       msgContents: inputRef.current.value,
-      chatRoomId: 17, //for test
-      msgFrom: "35",//for test
+      chatRoomId: currentChatRoomId, //for test
+      msgFrom: accountId,//for test
+      role: role,
+      socketId : socketId,
+      type: "chat",
     };
+
+    console.log("send message : ", message);
 
     socket.send(JSON.stringify(message));
 
@@ -590,6 +626,18 @@ const Contents = () => {
     // Clear the input field
     inputRef.current.value = "";
   };
+
+  const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
+    const message = {
+      type: "updateSocketId",
+      chatRoomId: chatRoomId,
+      accountId: myAccountId,
+      socketId: mySocketId,
+      role: role,
+    };
+
+    socket.send(JSON.stringify(message));
+  }
 
   return (
     <main style={{ background: "#e5ecef" }}>
@@ -636,7 +684,7 @@ const Contents = () => {
                 </div>
 
                 <ChatList className={chatListArr?.length > 8 ? "existScroll" : ""}>
-                  {chatListArr.map((item, index) => (
+                  {/* {chatListArr.map((item, index) => (
                     <ChatItem key={index}>
                       <div className="userImg">
                         <img src={item.userImg} alt="변리사이미지" />
@@ -652,7 +700,7 @@ const Contents = () => {
                         </div>
                       </div>
                     </ChatItem>
-                  ))}
+                  ))} */}
                 </ChatList>
               </ChatListBox>
 
@@ -669,7 +717,7 @@ const Contents = () => {
 
                 <div className="contents">
                   <ChatContents>
-                    {chatArr.map((item, index) => {
+                    {/* {chatArr.map((item, index) => {
                       const prevItem = chatArr[index - 1];
                       const prevCheck = prevItem && prevItem.userName === item.userName;
                       const isSameTime = prevCheck && prevItem.writedAt === item.writedAt;
@@ -710,7 +758,7 @@ const Contents = () => {
                           )}
                         </>
                       );
-                    })}
+                    })} */}
                   </ChatContents>
                 </div>
 

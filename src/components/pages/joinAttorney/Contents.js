@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
-import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/agent";
+import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
 import { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
 

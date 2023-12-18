@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { getQuotationByPreMatchingNoAndAgentNo } from "../../../api/agent";
+import { getQuotationByPreMatchingNoAndAgentNo } from "../../../api/axiosApi";
 import { useGetPreMatchingListAIDQuery } from "../../../api/preMatching";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";

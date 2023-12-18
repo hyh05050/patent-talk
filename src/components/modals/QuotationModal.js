@@ -2,7 +2,7 @@ import { Warning } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import Modal from "react-modal";
-import { sendQuotation } from "../../api/agent";
+import { sendQuotation } from "../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
 import { setQuotationModal } from "../../store/slice/modal";
 

@@ -25,3 +25,15 @@ export const getQuotationByPreMatchingNoAndAgentNo = async (preMatchingId, agent
 export const sendQuotation = async (data) => {
   return await axios.post(BASE_URL + "/preMatching/sendQuotation", data);
 };
+
+export const getChatRoomListByClientId = async (data) => {
+  return await axios.get(BASE_URL + "/chat/getChatRoomClient?clientId=" + data);
+}
+
+export const getChatRoomListByAttorneyId = async (data) => {
+  return await axios.get(BASE_URL + "/chat/getChatRoomAttorney?attorneyId=" + data);
+}
+
+export const getChatRoomDetail = async (chatRoomId, listCount, skipCount) => {
+  return await axios.get(BASE_URL + "/chat?chatRoomId=" + chatRoomId + "&listCount=" + listCount + "&skipCount=" + skipCount);
+}
