@@ -532,7 +532,8 @@ const YourMessage = styled.div`
   }
 `;
 
-const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
+// const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
+var socket = new WebSocket("wss://indieip.startlump.com/socket/chat");
 const Contents = () => {
   const [userName, setUserName] = useState(Storage.get("humanName"));
   const [email, setEmail] = useState(Storage.get("accountKey"));
