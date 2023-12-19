@@ -37,3 +37,7 @@ export const getChatRoomListByAttorneyId = async (data) => {
 export const getChatRoomDetail = async (chatRoomId, listCount, skipCount) => {
   return await axios.get(BASE_URL + "/chat?chatRoomId=" + chatRoomId + "&listCount=" + listCount + "&skipCount=" + skipCount);
 }
+
+export const getAccountProfile = async (data) => {
+  return await axios.get(BASE_URL + "/account/profile/" + data);
+}

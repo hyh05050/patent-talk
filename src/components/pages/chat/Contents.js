@@ -2,11 +2,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { getAccountProfile } from "../../../api/axiosApi";
+import { useGetChatByRoomIdMutation, useGetChatRoomListQuery } from "../../../api/chat";
 import fileIcon from "../../../assets/images/file.png";
 import userImg from "../../../assets/images/user.png";
 import { Storage } from "../../../modules/Storage";
-import { useGetChatByRoomIdMutation, useGetChatByRoomIdQuery, useGetChatRoomListQuery } from "../../../api/chat";
-import { getChatRoomDetail } from "../../../api/axiosApi";
 import { compareDate, dateFormat, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
 
 const Container = styled.div`
@@ -548,6 +548,7 @@ const Contents = () => {
     role === "client" ? `getChatRoomClient?clientId=${accountId}` : `getChatRoomAttorney?attorneyId=${accountId}`
   );
   const [chatApi] = useGetChatByRoomIdMutation();
+  const [targetName , setTargetName] = useState("상대방");
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -570,7 +571,7 @@ const Contents = () => {
         console.log("session id : " + data.sessionId);
         setSocketId(data.sessionId);
       } else if (data.type === "chat") {
-        data.createdAt = "2023-12-18 21:21:21";
+        data.createdAt = new Date().toISOString();
         data.id = new Date().getTime();
         console.log("chat message : " + JSON.stringify(data));
         setChats((prev) => [...prev, data]);
@@ -584,13 +585,15 @@ const Contents = () => {
   }, []);
 
   useEffect(() => {
-    if (rooms && rooms.length > 0) {
-      updateSocketId(rooms[0].id, accountId, socketId);
-      onClickRoom(rooms[0].id);
+    console.log("rooms : ", rooms?.data);
+    if (rooms && rooms?.data.length > 0) {
+      updateSocketId(rooms.data[0].id, accountId, socketId);
+      onClickRoom(rooms.data[0].id);
     }
   }, [rooms]);
 
   const onClickRoom = (roomId) => {
+    updateSocketId(roomId, accountId, socketId);
     chatApi({ roomId: roomId, listCount: 10, skipCount: 0 })
       .unwrap()
       .then(({ status, data: chat }) => {
@@ -612,7 +615,9 @@ const Contents = () => {
       alert("채팅방을 선택해주세요.");
       return;
     }
-
+    if(inputRef.current.value === ""){
+      return;
+    }
     const message = {
       msgContents: inputRef.current.value,
       chatRoomId: chats[0]?.chatRoomId, //for test
@@ -633,6 +638,17 @@ const Contents = () => {
     inputRef.current.value = "";
   };
 
+  const handleOnkeyDown = (e) => {
+    if (e.nativeEvent.isComposing) {
+      console.log("isComposing");
+      e.stopPropagation();
+    }
+    else if (e.key === "Enter") {
+      console.log("enter");
+      handleSend();
+    }
+  };
+
   const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
     console.log("mySocketId : ", mySocketId);
     const message = {
@@ -642,7 +658,16 @@ const Contents = () => {
       socketId: mySocketId,
       role: role,
     };
-
+    //update chatroom name
+    // find target id
+    const targetRoom = rooms?.data?.find((room) => room.id === chatRoomId);
+    const targetId = role === "client" ? targetRoom?.attorneyId : targetRoom?.clientId;
+    getAccountProfile(targetId).then((res) => {
+      if (res.status === 200) {
+        console.log("targetName : ", res.data.data.humanName);
+        setTargetName(res.data.data.humanName);
+      }
+    });
     socket.send(JSON.stringify(message));
   };
 
@@ -717,7 +742,7 @@ const Contents = () => {
                 <div className="title">
                   <div className="chatPartner">
                     <img src={userImg} alt="" />
-                    <span>김특허 변리사</span>
+                    {role == "client" ?  <span>{targetName} 변리사</span> : <span>{targetName} 고객</span>}
                   </div>
                   <div className="fileDoc">
                     <img src={userImg} alt="" />
@@ -758,7 +783,7 @@ const Contents = () => {
                               <div className="message">
                                 {!isSameTime && (
                                   <div className="title">
-                                    <div className="name">{chat?.userName ? chat?.userName : "상대"}</div>
+                                    <div className="name">{chat?.userName ? chat?.userName : ""}</div>
                                     <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
                                   </div>
                                 )}
@@ -777,7 +802,7 @@ const Contents = () => {
                 <div className="inputBox">
                   <div className="chat">
                     <img src={fileIcon} alt="파일 등록" />
-                    <input type="text" placeholder="메시지를 입력하세요" ref={inputRef} />
+                    <input type="text" placeholder="메시지를 입력하세요" ref={inputRef} onKeyDown={handleOnkeyDown}/>
                   </div>
                   <div className="sendButton">
                     <button onClick={handleSend}>보내기</button>
