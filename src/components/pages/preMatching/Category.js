@@ -1,4 +1,8 @@
-import PatentIcon from "../../../assets/images/patent.png";
+import BmIcon from "../../../assets/images/ic_bm.jpeg";
+import DesignIcon from "../../../assets/images/ic_design.jpeg";
+import EtcIcon from "../../../assets/images/ic_etc.jpeg";
+import MarkIcon from "../../../assets/images/ic_mark.jpeg";
+import PatentIcon from "../../../assets/images/ic_patent.jpeg";
 
 const patentList = [
   {
@@ -40,7 +44,7 @@ const patentList = [
   {
     name: "bm",
     title: "BM",
-    icon: PatentIcon,
+    icon: BmIcon,
     typeList: ["중개업", "광고", "제휴", "커뮤니티", "O2O", "지식서비스", "게임", "플랫폼"],
   },
   {
@@ -55,22 +59,22 @@ const trademarkList = [
   {
     name: "text",
     title: "문자 상표",
-    icon: PatentIcon,
+    icon: MarkIcon,
   },
   {
     name: "shape",
     title: "도형 상표",
-    icon: PatentIcon,
+    icon: DesignIcon,
   },
   {
     name: "unit",
     title: "결합 상표",
-    icon: PatentIcon,
+    icon: MarkIcon,
   },
   {
     name: "others",
     title: "기타",
-    icon: PatentIcon,
+    icon: DesignIcon,
   },
 ];
 
@@ -84,19 +88,19 @@ export const categoryList = [
   {
     name: "trademark",
     title: "상표",
-    icon: PatentIcon,
+    icon: MarkIcon,
     typeList: trademarkList,
   },
   {
     name: "design",
     title: "디자인",
-    icon: PatentIcon,
+    icon: DesignIcon,
     typeList: [],
   },
   {
     name: "etc",
     title: "기타",
-    icon: PatentIcon,
+    icon: EtcIcon,
     typeList: [],
   },
 ];

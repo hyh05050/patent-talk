@@ -1,7 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import BannerImg from "../../../assets/images/banner.webp";
-import { Link } from "react-router-dom";
 
 const ColumnDiv = styled.div`
   display: flex;
@@ -51,7 +51,7 @@ const LBContent = styled.div`
   @media screen and (min-width: 960px) {
     padding-top: 86px;
     padding-bottom: 107px;
-    padding-left: 48px;
+    padding-left: 35px;
     height: 380px;
   }
 `;
@@ -113,11 +113,11 @@ const LBTitle = styled.p`
   white-space: pre-line;
   text-align: center;
   font-weight: 700;
-  font-size: 20px;
+  font-size: 17px;
   line-height: 28px;
 
   @media screen and (min-width: 960px) {
-    font-size: 33px;
+    font-size: 30px;
     line-height: 50px;
     text-align: initial;
     margin-bottom: 4px;
@@ -153,7 +153,7 @@ const AttorneyBox = styled.div`
   width: 545px;
   height: 219px;
   position: absolute;
-  right: -31px;
+  right: -65px;
   z-index: 1;
 
   @media screen and (min-width: 960px) {
@@ -256,6 +256,7 @@ const RBMatchingButton = styled.div`
     padding-right: 10px;
     padding-top: 6px;
     padding-bottom: 6px;
+    margin-top: 80px;
   }
 
   p {
@@ -317,15 +318,15 @@ const MainBanner = () => {
             <LBTextBox>
               <MatchingButton>
                 <Link to={"/preMatching"}>
-                  <p>변리사 찾기</p>
+                  <p>변리사 견적 받기</p>
                 </Link>
               </MatchingButton>
               <LBTitle>
-                여러 변리사 답변을 <br /> 5분 만에 확인해보세요
+                내 특허에 딱 맞춘 변리사!<br/> 지금 바로 견적을 받아보세요
               </LBTitle>
               <LBSubTitle>
                 <p>
-                  앉은 자리에서 여러 변리사 답변을 확인하고 <br /> 내게 꼭 맞는 변리사를 찾아보세요
+                  클릭 몇번으로 여러 변리사 견적을 확인하고 <br /> 내게 꼭 맞는 변리사를 찾아보세요
                 </p>
               </LBSubTitle>
             </LBTextBox>
@@ -340,15 +341,16 @@ const MainBanner = () => {
       <RightBanner>
         <RBContent>
           <RBContentBox>
+            
+            <RBTitle>비용이 걱정되신다구요?</RBTitle>
+            <RBSubTitle>
+              <p>다양한 지원사업을 찾아보세요</p>
+            </RBSubTitle>
             <RBMatchingButton>
-              <Link to={"/preMatching"}>
-                <p>변리사 찾기</p>
+              <Link to={"https://www.kipa.org"} target={"_black"}>
+                <p>지원사업 알아보기</p>
               </Link>
             </RBMatchingButton>
-            <RBTitle>변리사 비용이 부담된다면 전액 지원받으세요</RBTitle>
-            <RBSubTitle>
-              <p>비용 부담 없이 특허 진행할 수 있어요</p>
-            </RBSubTitle>
           </RBContentBox>
         </RBContent>
       </RightBanner>

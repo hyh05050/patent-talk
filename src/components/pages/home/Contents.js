@@ -50,7 +50,7 @@ const Field = styled.div`
   padding: 20px;
 
   border-radius: 8px;
-  background-color: transparent;
+  background-color: #fafafa;
   border: 1px solid #e9ecef;
   color: #17181a;
 
@@ -215,15 +215,17 @@ const Contents = () => {
         <div className="container">
           <Section2Div>
             <div>
-              <p>인디프 변리사비 지원 서비스</p>
-              <h2>부담스러운 특허비용을 지원해드려요</h2>
+              <p>IP 비용 지원 사업 찾아보기</p>
+              <h2>부담스러운 특허비용을 지원받을 수 있는 프로그램을 찾아보세요</h2>
             </div>
             <div>
               <img src={dummyImg} alt="이미지" style={{ maxWidth: "140px", margin: "32px", width: "100%" }} />
             </div>
             <div>
               <p>변리사비 지원도 신청하고</p>
-              <button type="button">인디프에서 특허 신청하기</button>
+              <button type="button" onClick={() => {
+                window.open("https://www.kipa.org", "_blank", "noopener noreferrer");
+              }}>인디프에서 특허 신청하기</button>
             </div>
           </Section2Div>
         </div>

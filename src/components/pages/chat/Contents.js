@@ -532,7 +532,8 @@ const YourMessage = styled.div`
 `;
 
 // const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
-var socket = new WebSocket("wss://indieip.startlump.com/socket/chat");
+var socket ;
+var pingPong = null;;
 const Contents = () => {
   const [userName, setUserName] = useState(Storage.get("humanName"));
   const [email, setEmail] = useState(Storage.get("accountKey"));
@@ -544,6 +545,7 @@ const Contents = () => {
   const scrollRef = useRef(null);
   const accountId = Storage.get("accountId");
   const role = Storage.get("role") === "client" ? "client" : "attorney";
+  const [currentChatRoomId, setCurrentChatRoomId] = useState(null);
   const { data: rooms, isLoading } = useGetChatRoomListQuery(
     role === "client" ? `getChatRoomClient?clientId=${accountId}` : `getChatRoomAttorney?attorneyId=${accountId}`
   );
@@ -560,32 +562,52 @@ const Contents = () => {
   }, [chats]);
 
   useEffect(() => {
+    makeSession();
+
+    return () => {
+      if(pingPong) clearInterval(pingPong);
+      socket.close();
+    }
+
+  }, []);
+
+  useEffect(() => {
+    updateSocketId(currentChatRoomId, accountId, socketId);
+  }, [currentChatRoomId, socketId, accountId]);
+
+  function makeSession() {
+    if(socket?.readyState === WebSocket.OPEN) return;
+    
+    socket = new WebSocket("wss://indieip.startlump.com/socket/chat");
+    
+    
+    if(pingPong) clearInterval(pingPong); //clear privious pingPong
+    //set pingPong
+    pingPong = setInterval(() => {
+      socket.send(JSON.stringify({ "keepConnection":"ping" }));
+    }, 15000);
     socket.onopen = () => {
-      console.log("connected to " + socket.url);
-      // updateSocketId(2, accountId, socketId);  //chatRoomId : 2 for test
+      
     };
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
-      // console.log(data);
       if (data.type === "session") {
-        console.log("session id : " + data.sessionId);
         setSocketId(data.sessionId);
       } else if (data.type === "chat") {
         data.createdAt = new Date().toISOString();
         data.id = new Date().getTime();
-        console.log("chat message : " + JSON.stringify(data));
         setChats((prev) => [...prev, data]);
       } else {
-        console.log("got some message: ", data);
+        
       }
     };
     socket.onclose = () => {
       console.log("disconnected");
+      // makeSession();
     };
-  }, []);
+  }
 
   useEffect(() => {
-    console.log("rooms : ", rooms?.data);
     if (rooms && rooms?.data.length > 0) {
       updateSocketId(rooms.data[0].id, accountId, socketId);
       onClickRoom(rooms.data[0].id);
@@ -594,14 +616,16 @@ const Contents = () => {
 
   const onClickRoom = (roomId) => {
     updateSocketId(roomId, accountId, socketId);
+    setCurrentChatRoomId(roomId);
     chatApi({ roomId: roomId, listCount: 10, skipCount: 0 })
       .unwrap()
       .then(({ status, data: chat }) => {
         if (status === "success") {
           if (chat && chat.length > 0) {
             const sortedChat = [...chat].reverse();
-            console.log("chat list : ", sortedChat);
             setChats(sortedChat);
+          } else {
+            setChats([]);
           }
         }
       })
@@ -611,7 +635,7 @@ const Contents = () => {
   };
 
   const handleSend = () => {
-    if (!chats || chats[0]?.chatRoomId === null) {
+    if (currentChatRoomId === null) {
       alert("채팅방을 선택해주세요.");
       return;
     }
@@ -620,14 +644,13 @@ const Contents = () => {
     }
     const message = {
       msgContents: inputRef.current.value,
-      chatRoomId: chats[0]?.chatRoomId, //for test
+      chatRoomId: currentChatRoomId,
       msgFrom: accountId, //for test
       role: role,
       socketId: socketId,
       type: "chat",
     };
 
-    console.log("send message : ", message);
 
     socket.send(JSON.stringify(message));
 
@@ -640,17 +663,18 @@ const Contents = () => {
 
   const handleOnkeyDown = (e) => {
     if (e.nativeEvent.isComposing) {
-      console.log("isComposing");
+      
       e.stopPropagation();
     }
     else if (e.key === "Enter") {
-      console.log("enter");
+      
       handleSend();
     }
   };
 
   const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
-    console.log("mySocketId : ", mySocketId);
+    
+    if(chatRoomId === null || myAccountId === null || mySocketId === null) return;
     const message = {
       type: "updateSocketId",
       chatRoomId: chatRoomId,
@@ -664,7 +688,7 @@ const Contents = () => {
     const targetId = role === "client" ? targetRoom?.attorneyId : targetRoom?.clientId;
     getAccountProfile(targetId).then((res) => {
       if (res.status === 200) {
-        console.log("targetName : ", res.data.data.humanName);
+        
         setTargetName(res.data.data.humanName);
       }
     });
