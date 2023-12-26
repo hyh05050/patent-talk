@@ -440,7 +440,7 @@ const AttorneyContents = () => {
                         <th>특허 유형</th>
                         <th>분류</th>
                         <th>상세 정보</th>
-                        <th>견적</th>
+                        <th></th>
                       </tr>
                     </thead>
                     <tbody>
@@ -463,7 +463,7 @@ const AttorneyContents = () => {
                             <td>
                               {matching.managerId ? (
                                 <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
-                                  {matching?.managerName} 견적 확인
+                                  {matching?.managerName} 대화방으로 이동
                                 </button>
                               ) : (
                                 <button

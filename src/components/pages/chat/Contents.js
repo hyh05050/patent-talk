@@ -2,7 +2,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { getAccountProfile } from "../../../api/axiosApi";
+import { getAccountProfile, getPreMatchingInfo } from "../../../api/axiosApi";
 import { useGetChatByRoomIdMutation, useGetChatRoomListQuery } from "../../../api/chat";
 import fileIcon from "../../../assets/images/file.png";
 import userImg from "../../../assets/images/user.png";
@@ -551,6 +551,8 @@ const Contents = () => {
   );
   const [chatApi] = useGetChatByRoomIdMutation();
   const [targetName , setTargetName] = useState("상대방");
+  const [roomTitle, setRoomTitle] = useState("발명 제목");
+  
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -573,6 +575,13 @@ const Contents = () => {
 
   useEffect(() => {
     updateSocketId(currentChatRoomId, accountId, socketId);
+    if(rooms != null && rooms?.data.length > 0){
+      const targetRoom = rooms?.data?.find((room) => room.id === currentChatRoomId);
+      const preMatchingId = targetRoom.preMatchingId;
+      getPreMatchingInfo(preMatchingId).then((res) => {
+        setRoomTitle("발명 제목 : " + res.data.data.detail);
+      });
+    }
   }, [currentChatRoomId, socketId, accountId]);
 
   function makeSession() {
@@ -754,6 +763,7 @@ const Contents = () => {
                         </div>
                         <div className="contents">
                           <div className="msg">{room?.lastMsg}</div>
+                          <div className="msg">{roomTitle}</div>
                           <div className="file">{room?.file}</div>
                         </div>
                       </div>
@@ -771,6 +781,10 @@ const Contents = () => {
                   <div className="fileDoc">
                     <img src={userImg} alt="" />
                   </div>
+                </div>
+
+                <div className="title">
+                  <span>{roomTitle}</span>
                 </div>
 
                 <div className="contents">

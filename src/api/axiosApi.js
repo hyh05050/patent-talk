@@ -49,3 +49,7 @@ export const requestVerifyCode = async (email) => {
 export const verifyCode = async (data) => {
   return await axios.post(BASE_URL + "/account/verifyCode", data);
 }
+
+export const getPreMatchingInfo = async (pId) => {
+  return await axios.get(BASE_URL + "/preMatching/" + pId);
+}
