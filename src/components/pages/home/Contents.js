@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import dummyImg from "../../../assets/images/funding_img_pc.webp";
 import { categoryList } from "../preMatching/Category";
 import AttorneySlider from "./AttorneySlider";
 import BannerSlider from "./BannerSlider";
@@ -218,14 +217,14 @@ const Contents = () => {
               <p>IP 비용 지원 사업 찾아보기</p>
               <h2>부담스러운 특허비용을 지원받을 수 있는 프로그램을 찾아보세요</h2>
             </div>
-            <div>
+            {/* <div>
               <img src={dummyImg} alt="이미지" style={{ maxWidth: "140px", margin: "32px", width: "100%" }} />
-            </div>
+            </div> */}
             <div>
-              <p>변리사비 지원도 신청하고</p>
+              {/* <p>변리사비 지원도 신청하고</p> */}
               <button type="button" onClick={() => {
                 window.open("https://www.kipa.org", "_blank", "noopener noreferrer");
-              }}>인디프에서 특허 신청하기</button>
+              }}>지원사업 정보 알아보기</button>
             </div>
           </Section2Div>
         </div>

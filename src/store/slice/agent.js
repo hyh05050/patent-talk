@@ -48,7 +48,7 @@ export const agentSlice = createSlice({
       .addMatcher(
         (action) => agentApi.endpoints.getAgentInfo.matchFulfilled(action),
         (state, { payload }) => {
-          console.log(payload);
+          // console.log(payload);
           if (payload.status === "success") {
             const {
               agentNo,

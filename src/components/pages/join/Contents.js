@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
+import { requestVerifyCode, verifyCode } from "../../../api/axiosApi";
 import { useAppDispatch } from "../../../store";
 import { setAlertModal } from "../../../store/slice/modal";
 
@@ -212,12 +213,39 @@ const JoinButton = styled.button`
   }
 `;
 
+const CheckInformationBtn = styled.button`
+  font-size: 14px;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #fff;
+  letter-spacing: 0px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 40px;
+  background-color: #202d90;
+  margin-top: 12px;
+  margin-bottom: 0px;
+
+  &.disabled {
+    background-color: #adb5bd;
+  }
+
+`;
+
 const Contents = () => {
   const navigate = useNavigate();
   const [joinAPI] = useJoinMutation();
   const requiredPolicy = ["policy1", "policy2", "policy3"];
   const policyList = requiredPolicy.concat(["policy4"]);
   const [isChecked, setChecked] = useState(false);
+  const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isEmailVerify, setIsEmailVerify] = useState(false);
   const dispatch = useAppDispatch();
 
   const {
@@ -294,12 +322,58 @@ const Contents = () => {
         { shouldFocus: true }
       );
       return;
+    } else if (!isEmailVerify) {
+      alert("이메일 인증을 완료해주세요.");
+      return;
     }
 
     try {
       join(data);
     } catch (error) {}
   };
+
+  const requestVerifyEmail = () => {
+    console.log("requestVerifyEmail");
+    const emailParam = document.getElementById("email").value;
+    setIsCodeSent(true);
+    requestVerifyCode(emailParam).then((res) => {
+      if(res.data.status === "success") {
+        console.log("코드 발송 성공");
+        alert("이메일로 인증번호가 발송되었습니다.");
+      } else {
+        console.log("코드 발송 실패");
+        if(res.data.reason === "AlreadyAccountExist"){
+          alert("이미 가입된 이메일입니다.");
+        } else {
+          alert("이메일로 인증번호 발송에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
+        }
+        setIsCodeSent(false);
+      }
+    }).catch((err) => {
+      setIsCodeSent(false);
+      alert("이메일로 인증번호 발송에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
+      console.log(err);
+    });
+  }
+
+  const confirmCode = () => {
+    console.log("confirmCode");
+    console.log(document.getElementById("email_check").value);
+    const emailParam = document.getElementById("email").value;
+    const codeParam = document.getElementById("email_check").value;
+    verifyCode({email: emailParam, code: codeParam}).then((res) => {
+      if(res.data.status === "success") {
+        console.log("코드 확인 성공");
+        alert("이메일 인증이 완료되었습니다.");
+        setIsEmailVerify(true);
+      } else {
+        alert("인증번호가 일치하지 않습니다.");
+        console.log("코드 확인 실패");
+      }
+    } ).catch((err) => {
+      console.log(err);
+    } );
+  }
 
   return (
     <main>
@@ -315,6 +389,7 @@ const Contents = () => {
                     type="email"
                     id="email"
                     placeholder="이메일 아이디"
+                    disabled={isEmailVerify}
                     {...register("accountKey", {
                       required: "이메일을 입력해주세요.",
                       pattern: {
@@ -325,6 +400,19 @@ const Contents = () => {
                   />
                   {errors?.accountKey && <WarningMessage>{errors.accountKey.message}</WarningMessage>}
                 </JoinInputBox>
+
+                <JoinInputBox>
+                  <label htmlFor="email">이메일 확인</label>
+                  <input
+                    type="text"
+                    id="email_check"
+                    placeholder="인증번호"
+                    disabled={isEmailVerify}
+                    />
+                    <CheckInformationBtn type="button" disabled={isCodeSent} className={isCodeSent && "disabled"} onClick={requestVerifyEmail}>인증번호 받기</CheckInformationBtn>
+                    <CheckInformationBtn type="button" disabled={isEmailVerify} className={isEmailVerify && "disabled"} onClick={confirmCode}>인증번호 확인</CheckInformationBtn>
+                </JoinInputBox>
+
                 <JoinInputBox>
                   <label htmlFor="email">이름</label>
                   <input

@@ -673,11 +673,11 @@ const Contents = () => {
           });
         });
         params.fileList = fileData;
-        console.log(params);
+        // console.log(params);
         matching(params);
       });
     } else {
-      console.log(params);
+      // console.log(params);
       matching(params);
     }
   };

@@ -24,7 +24,7 @@ export const accountSlice = createSlice({
         (action) =>
           accountApi.endpoints.login.matchFulfilled(action) || accountApi.endpoints.join.matchFulfilled(action),
         (state, { payload }) => {
-          console.log(payload);
+          // console.log(payload);
           if (payload.status === "success") {
             const { accountKey, password, humanName, roles } = payload.data;
             state.account = { accountKey, password, humanName, roles };

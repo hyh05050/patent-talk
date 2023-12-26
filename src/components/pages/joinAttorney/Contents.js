@@ -3,10 +3,10 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useJoinMutation } from "../../../api/account";
-import { getAgentInfoByAgentName, getAgentInfoByAgentNo } from "../../../api/axiosApi";
+import { useGetAgentInfoMutation } from "../../../api/agent";
+import { requestVerifyCode, verifyCode } from "../../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
 import { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
-import { useGetAgentInfoMutation } from "../../../api/agent";
 
 const JoinPage = styled.div`
   display: flex;
@@ -232,6 +232,11 @@ const CheckInformationBtn = styled.button`
   background-color: #202d90;
   margin-top: 12px;
   margin-bottom: 24px;
+
+  &.disabled {
+    background-color: #adb5bd;
+  }
+
 `;
 
 const Contents = () => {
@@ -240,10 +245,14 @@ const Contents = () => {
   const requiredPolicy = ["policy1", "policy2", "policy3"];
   const policyList = requiredPolicy.concat(["policy4"]);
   const [isChecked, setChecked] = useState(false);
+
   const [duplicateCheck, setDuplicateCheck] = useState(false);
   const dispatch = useAppDispatch();
   const { agentInformation: modal } = useAppSelector(modalSelector);
   const [agentApi] = useGetAgentInfoMutation();
+
+  const [isEmailVerify, setEmailVerify] = useState(false);
+  const [isCodeSent, setIsCodeSent] = useState(false);
 
   const {
     register,
@@ -308,6 +317,58 @@ const Contents = () => {
     setChecked(isRequiredPolicy);
   };
 
+  const requestVerifyEmail = () => {
+    console.log("requestVerifyEmail");
+    const emailParam = getValues("accountKey");
+    if (!emailParam) {
+      alert("이메일을 입력해주세요.");
+      return;
+    }
+    if (!emailParam.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      alert("유효한 이메일 주소를 입력하세요.");
+      return;
+    }
+    setIsCodeSent(true);
+    requestVerifyCode(emailParam).then((res) => {
+      if(res.data.status === "success") {
+        console.log("이메일로 인증번호 발송 성공");
+        alert("이메일로 인증번호가 발송되었습니다.");
+      } else {
+        console.log("코드 발송 실패");
+        if(res.data.reason === "AlreadyAccountExist"){
+          alert("이미 가입된 이메일입니다.");
+        } else {
+          alert("이메일로 인증번호 발송에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
+        }
+        setIsCodeSent(false);
+      }
+    }).catch((err) => {
+      setIsCodeSent(false);
+      alert("이메일로 인증번호 발송에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
+      console.log(err);
+    });
+  }
+
+  const confirmCode = () => {
+    console.log("confirmCode");
+    const emailParam = getValues("accountKey");
+    const codeParam = document.getElementById("email_check").value;
+    verifyCode({email: emailParam, code: codeParam}).then((res) => {
+      if(res.data.status === "success") {
+        console.log("코드 확인 성공");
+        alert("이메일 인증이 완료되었습니다.");
+        setEmailVerify(true);
+      } else {
+        console.log("코드 확인 실패");
+        alert("인증번호가 일치하지 않습니다.");
+      }
+    }).catch((err) => {
+      alert("이메일 인증에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
+      console.log(err);
+    });
+  }
+
+
   const onSubmit = (data) => {
     console.log("onSubmit");
     if (!duplicateCheck) {
@@ -327,6 +388,10 @@ const Contents = () => {
         },
         { shouldFocus: true }
       );
+      return;
+    }
+    if(!isEmailVerify) {
+      alert("이메일 인증을 완료해주세요.");
       return;
     }
 
@@ -373,7 +438,7 @@ const Contents = () => {
             return;
           }
 
-          if (agentInfo.length === 1) {
+          if (agentInfo.length == 1) {
             setAgentInfo(true, agentInfo[0]);
 
             return;
@@ -444,7 +509,7 @@ const Contents = () => {
             }
 
             setDuplicateCheck(true);
-            setAgentInfo(false, agentInfo);
+            setAgentInfo(false, agentInfo[0]);
 
             return;
           }
@@ -487,6 +552,7 @@ const Contents = () => {
                     type="email"
                     id="email"
                     placeholder="이메일 아이디"
+                    disabled={isEmailVerify}
                     {...register("accountKey", {
                       required: "이메일을 입력해주세요.",
                       pattern: {
@@ -497,6 +563,19 @@ const Contents = () => {
                   />
                   {errors?.accountKey && <WarningMessage>{errors.accountKey.message}</WarningMessage>}
                 </JoinInputBox>
+
+                <JoinInputBox>
+                  <label htmlFor="email">이메일 확인</label>
+                  <input
+                    type="text"
+                    id="email_check"
+                    placeholder="인증번호"
+                    disabled={isEmailVerify}
+                    />
+                    <CheckInformationBtn type="button" disabled={isCodeSent} className={isCodeSent && "disabled"} onClick={requestVerifyEmail}>인증번호 받기</CheckInformationBtn>
+                    <CheckInformationBtn type="button" disabled={isEmailVerify} className={isEmailVerify && "disabled"} onClick={confirmCode}>인증번호 확인</CheckInformationBtn>
+                </JoinInputBox>
+
                 <JoinInputBox>
                   <label htmlFor="humanName">이름</label>
                   <input

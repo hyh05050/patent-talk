@@ -41,3 +41,11 @@ export const getChatRoomDetail = async (chatRoomId, listCount, skipCount) => {
 export const getAccountProfile = async (data) => {
   return await axios.get(BASE_URL + "/account/profile/" + data);
 }
+
+export const requestVerifyCode = async (email) => {
+  return await axios.get(BASE_URL + "/account/requestVerifyCode/" + email);
+}
+
+export const verifyCode = async (data) => {
+  return await axios.post(BASE_URL + "/account/verifyCode", data);
+}

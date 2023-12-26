@@ -21,7 +21,7 @@ export const matchingSlice = createSlice({
       .addMatcher(
         (action) => matchingApi.endpoints.getMatching.matchFulfilled(action),
         (state, { payload }) => {
-          console.log(payload);
+          // console.log(payload);
           if (payload.status === "success") {
             const { matchingId, name, company, typeList, careerList, expList, createdAt } = payload.data;
             state.matching = { matchingId, name, company, typeList, careerList, expList, createdAt };

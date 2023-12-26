@@ -1,10 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import Slider from "react-slick";
-import "../../../assets/scss/slick.scss";
-import "../../../assets/scss/slick-theme.scss";
 import styled from "styled-components";
 import BannerImg from "../../../assets/images/banner_slider.webp";
-import { Link } from "react-router-dom";
+import "../../../assets/scss/slick-theme.scss";
+import "../../../assets/scss/slick.scss";
 
 const SliderBox = styled.div`
   display: flex;
@@ -243,11 +243,11 @@ const BannerSlider = () => {
                   <LBTextBox>
                     <LBMatchingButton>
                       <Link to="/preMatching">
-                        <p>변리사 상담받기</p>
+                        <p>변리사 견적 받기</p>
                       </Link>
                     </LBMatchingButton>
                     <LBTitle>
-                      여러 변리사 답변을 <br /> 5분만에 확인해보세요
+                      내 특허에 딱 맞춘<br /> 변리사를 찾아보세요
                     </LBTitle>
                   </LBTextBox>
                   <AttorneyBox>
@@ -263,10 +263,12 @@ const BannerSlider = () => {
               <SliderItem2>
                 <SliderItem2Content>
                   <RBMatchingButton>
-                    <p>변리사 지원 신청하기</p>
+                    <p>지원사업 알아보기</p>
                   </RBMatchingButton>
-                  <RBTitle>
-                    변리사 비용이 부담된다면 <br /> 전액 지원받으세요
+                  <RBTitle onClick={()=>{
+                    window.open("https://www.kipa.org", "_blank", "noopener noreferrer");
+                  }}>
+                    비용이 걱정 되신다구요?<br /> 다양한 지원사업을 찾아보세요
                   </RBTitle>
                 </SliderItem2Content>
               </SliderItem2>
