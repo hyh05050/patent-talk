@@ -1,6 +1,6 @@
 import SearchIcon from "@mui/icons-material/Search";
 import React, { useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { getAccountProfile, getPreMatchingInfo } from "../../../api/axiosApi";
 import { useGetChatByRoomIdMutation, useGetChatRoomListQuery } from "../../../api/chat";
@@ -535,6 +535,7 @@ const YourMessage = styled.div`
 var socket ;
 var pingPong = null;;
 const Contents = () => {
+  const location = useLocation();
   const [userName, setUserName] = useState(Storage.get("humanName"));
   const [email, setEmail] = useState(Storage.get("accountKey"));
   const [searchTerm, setSearchTerm] = useState("");
@@ -552,6 +553,7 @@ const Contents = () => {
   const [chatApi] = useGetChatByRoomIdMutation();
   const [targetName , setTargetName] = useState("상대방");
   const [roomTitle, setRoomTitle] = useState("발명 제목");
+  const [roomTitles, setRoomTitles] = useState([]);
   
 
   useEffect(() => {
@@ -577,7 +579,8 @@ const Contents = () => {
     updateSocketId(currentChatRoomId, accountId, socketId);
     if(rooms != null && rooms?.data.length > 0){
       const targetRoom = rooms?.data?.find((room) => room.id === currentChatRoomId);
-      const preMatchingId = targetRoom.preMatchingId;
+      const preMatchingId = targetRoom?.preMatchingId;
+      if(preMatchingId == null) return;
       getPreMatchingInfo(preMatchingId).then((res) => {
         setRoomTitle("발명 제목 : " + res.data.data.detail);
       });
@@ -618,8 +621,27 @@ const Contents = () => {
 
   useEffect(() => {
     if (rooms && rooms?.data.length > 0) {
-      updateSocketId(rooms.data[0].id, accountId, socketId);
-      onClickRoom(rooms.data[0].id);
+      if(location.state && location.state.preMatchingId){
+        const preMatchingId = location.state.preMatchingId;
+        const targetRoom = rooms?.data?.find((room) => room.preMatchingId === preMatchingId);
+        if(targetRoom){
+          updateSocketId(targetRoom.id, accountId, socketId);
+          onClickRoom(targetRoom.id);
+        }
+      } else {
+        updateSocketId(rooms.data[0].id, accountId, socketId);
+        onClickRoom(rooms.data[0].id);
+      }
+      
+      var titles = [];
+      rooms?.data?.map((room, index) => {
+        const preMatchingId = room.preMatchingId;
+        if(preMatchingId == null) return;
+        getPreMatchingInfo(preMatchingId).then((res) => {
+          titles[index] = res.data.data.detail;
+        });
+      });
+      setRoomTitles(titles);
     }
   }, [rooms]);
 
@@ -763,7 +785,7 @@ const Contents = () => {
                         </div>
                         <div className="contents">
                           <div className="msg">{room?.lastMsg}</div>
-                          <div className="msg">{roomTitle}</div>
+                          <div className="msg">{roomTitles[index]}</div>
                           <div className="file">{room?.file}</div>
                         </div>
                       </div>
