@@ -22,8 +22,8 @@ export const Storage = {
       if (account.humanName) Storage.set("humanName", account.humanName);
       if (account.roles) Storage.set("role", account.roles);
     }
-    if (refreshToken) Storage.set("authUser", refreshToken);
-    if (accessToken) Storage.set("refreshToken", accessToken);
+    if (refreshToken) Storage.set("refreshToken", refreshToken);
+    if (accessToken) Storage.set("authToken", accessToken);
   },
 
   logout: () => {
@@ -33,6 +33,7 @@ export const Storage = {
 
     Storage.remove("authUser");
     Storage.remove("refreshToken");
+    Storage.remove("authToken");
 
     window.location.href = "/home";
   },

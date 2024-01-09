@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { getQuotationByPreMatchingNoAndAgentNo } from "../../../api/axiosApi";
 import { useGetPreMatchingListAIDQuery } from "../../../api/preMatching";
@@ -280,6 +280,7 @@ const MatchingBox = styled.div`
 `;
 
 const AttorneyContents = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [activeStatus, setActiveStatus] = useState("Not Matched Yet");
@@ -350,8 +351,8 @@ const AttorneyContents = () => {
     }
   };
 
-  const onClickAttorneyButton = () => {
-    navigate("/chat");
+  const onClickAttorneyButton = (preMatchingId) => {
+    navigate("/chat", { state: { preMatchingId: preMatchingId } });
   };
 
   if (isLoading) return <div>loading...</div>;
@@ -462,7 +463,7 @@ const AttorneyContents = () => {
                             <td>{matching.detail}</td>
                             <td>
                               {matching.managerId ? (
-                                <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
+                                <button type="button" className="download-btn" onClick={() => onClickAttorneyButton(matching.preMatchingId)}>
                                   {matching?.managerName} 대화방으로 이동
                                 </button>
                               ) : (
