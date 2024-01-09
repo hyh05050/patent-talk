@@ -288,7 +288,7 @@ const AttorneyContents = () => {
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const role = Storage.get("role");
-  const myAttorneyNo = role.substring(9);
+  const myAttorneyNo = Storage.get("agentNo");
   const { data: matchings, isLoading } = useGetPreMatchingListAIDQuery({ agentNo: myAttorneyNo });
 
   useEffect(() => {

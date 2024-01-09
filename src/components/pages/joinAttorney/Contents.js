@@ -266,7 +266,8 @@ const Contents = () => {
   const join = (accountInfo) => {
     joinAPI({
       ...accountInfo,
-      roles: "attorney-" + getValues("agentNo"),
+      roles: "attorney",
+      agentNo: getValues("agentNo"),
     })
       .unwrap()
       .then(({ status }) => {

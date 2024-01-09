@@ -21,6 +21,7 @@ export const Storage = {
       if (account.accountKey) Storage.set("accountKey", account.accountKey);
       if (account.humanName) Storage.set("humanName", account.humanName);
       if (account.roles) Storage.set("role", account.roles);
+      if (account.agentNo) Storage.set("agentNo", account.agentNo);
     }
     if (refreshToken) Storage.set("refreshToken", refreshToken);
     if (accessToken) Storage.set("authToken", accessToken);

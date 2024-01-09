@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { Storage } from "../modules/Storage";
 import { BASE_URL, httpObject } from "./config";
 
 // base URL과 엔드포인트들로 서비스 정의
@@ -7,7 +8,16 @@ import { BASE_URL, httpObject } from "./config";
 // query는 비동기로 처리되고, mutation은 동기로 처리
 export const preMatchingApi = createApi({
   reducerPath: "preMatchingApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = Storage.get("authToken");
+      if (token) {
+        headers.set("X-AUTH-TOKEN", token);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
     getPreMatchingList: builder.query({
       query: (payload) => `/preMatching?orderId=${payload.order_id}`,

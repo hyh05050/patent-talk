@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { BASE_URL, httpObject } from "./config";
+import { Storage } from "../modules/Storage";
+import { BASE_URL } from "./config";
 
 // base URL과 엔드포인트들로 서비스 정의
 // 엔드포인트는 query와 mutation으로 구분
@@ -7,7 +8,16 @@ import { BASE_URL, httpObject } from "./config";
 // query는 비동기로 처리되고, mutation은 동기로 처리
 export const agentApi = createApi({
   reducerPath: "agentApi",
-  baseQuery: fetchBaseQuery({ baseUrl: BASE_URL }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: BASE_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = Storage.get("authToken");
+      if (token) {
+        headers.set("X-AUTH-TOKEN", token);
+      }
+      return headers;
+    },
+  }),
   endpoints: (builder) => ({
     getAgentInfo: builder.mutation({
       query: (payload) => `/agent/${payload}`,
