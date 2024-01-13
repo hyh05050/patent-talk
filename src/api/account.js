@@ -22,14 +22,23 @@ export const accountApi = createApi({
     getAccountList: builder.query({
       query: () => `/account`,
     }),
+    getAccountInfo: builder.query({
+      query: (payload) => `/account/${payload}`,
+    }),
     login: builder.mutation({
       query: (payload) => httpObject("/login", "POST", payload),
     }),
     join: builder.mutation({
       query: (payload) => httpObject("/join", "POST", payload),
     }),
+    updateInfo: builder.mutation({
+      query: (payload) => httpObject("/account", "PUT", payload),
+    }),
+    updatePassword: builder.mutation({
+      query: (payload) => httpObject("/change/password", "POST", payload),
+    }),
   }),
 });
 
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
-export const { useGetAccountListQuery, useLoginMutation, useJoinMutation } = accountApi;
+export const { useGetAccountListQuery, useGetAccountInfoQuery, useLoginMutation, useJoinMutation, useUpdateInfoMutation, useUpdatePasswordMutation } = accountApi;

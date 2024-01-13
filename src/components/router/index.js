@@ -9,6 +9,7 @@ import Login from "../../pages/Login";
 import Matching from "../../pages/Matching";
 import Mypage from "../../pages/Mypage";
 import PreMatching from "../../pages/PreMatching";
+import EditProfile from "../../pages/EditProfile";
 
 const MainRouter = () => {
   const isLogin = Storage.get("accountKey") ? true : false;
@@ -24,6 +25,7 @@ const MainRouter = () => {
       <Route path="/preMatching/:field" element={<PreMatching />} />
       <Route path="/matching/:preMatchingId" element={isLogin ? <Matching /> : <Login />} />
       <Route path="/mypage" element={isLogin ? <Mypage /> : <Login />} />
+      <Route path="/mypage/modify" element={isLogin ? <EditProfile /> : <Login />} />
       <Route path="/chat" element={isLogin ? <Chat /> : <Login />} />
       <Route path="/findPassword" element={<FindPassword />} />
     </Routes>

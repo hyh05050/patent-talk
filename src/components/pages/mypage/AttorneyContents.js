@@ -383,6 +383,9 @@ const AttorneyContents = () => {
                       매칭 정보
                     </Link>
                   </li>
+                  <li>
+                    <Link to={"/mypage/modify"}>회원정보 수정</Link>
+                  </li>
                   <li onClick={() => Storage.logout()}>
                     <Link>로그아웃</Link>
                   </li>
