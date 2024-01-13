@@ -36,7 +36,7 @@ const Contents = () => {
     } else {
       //setUsername(Storage.get("humanName"));
       //setEmail(Storage.get("accountKey"));
-      if(accountInfo) console.log(accountInfo.data);
+      // if(accountInfo) console.log(accountInfo.data);
       if(accountInfo?.data?.humanName)  setUsername(accountInfo.data.humanName);
       if(accountInfo?.data?.accountKey) setEmail(accountInfo.data.accountKey);
       if(accountInfo?.data?.phone)      setPhone(accountInfo.data.phone);
@@ -45,7 +45,7 @@ const Contents = () => {
   }, [accountInfo]);
 
   const onSubmit = (data) => {
-    console.log("submit data : ", data); 
+    // console.log("submit data : ", data);
     updateInfo(data);
   };
 
@@ -79,14 +79,14 @@ const Contents = () => {
 
 
   const onPasswordSubmit = (data) => {
-    console.log("password submit data : ", data);
+    // console.log("password submit data : ", data);
     updatePassword(data);
   };
 
   const updatePassword = (passwordInfo) => {
-    console.log("passwordInfo : accountId : ", accountId);
-    console.log("passwordInfo currentpassword : ", passwordInfo.password);
-    console.log("passwordInfo newpassword : ", passwordInfo.newPassword);
+    // console.log("passwordInfo : accountId : ", accountId);
+    // console.log("passwordInfo currentpassword : ", passwordInfo.password);
+    // console.log("passwordInfo newpassword : ", passwordInfo.newPassword);
     if(passwordInfo.password === passwordInfo.newPassword) {
       setError(
         "passwordConfirm",
