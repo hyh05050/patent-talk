@@ -336,7 +336,7 @@ const Contents = () => {
     console.log("requestVerifyEmail");
     const emailParam = document.getElementById("email").value;
     setIsCodeSent(true);
-    requestVerifyCode(emailParam).then((res) => {
+    requestVerifyCode(emailParam, 0).then((res) => {
       if(res.data.status === "success") {
         console.log("코드 발송 성공");
         alert("이메일로 인증번호가 발송되었습니다.");

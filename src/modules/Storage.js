@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export const Storage = {
   set: (key, value) => {
     window.localStorage.setItem(key, String(value));
@@ -9,6 +11,29 @@ export const Storage = {
 
   get: (key) => {
     return window.localStorage.getItem(key);
+  },
+
+  getAccessToken: () => {
+    return window.localStorage.getItem("authToken");
+  },
+
+  doRefreshAccessToken: async () => {
+    const refreshToken = Storage.get("refreshToken");
+    return await axios.post("https://indieip.startlump.com/api/refresh", {
+      refreshToken: refreshToken,
+    });
+  },
+
+  checkAccessToken: async () => {
+    const accessToken = Storage.get("authToken");
+    if (!accessToken) {
+      return false;
+    }
+
+    const response = await axios.post("https://indieip.startlump.com/api/accessTokenTouch", {
+      accessToken: accessToken,
+    });
+    return response.data.status == "success" ? true : false;
   },
 
   remove: (key) => {

@@ -324,6 +324,11 @@ const Contents = () => {
                   {/* <Link to={"#"}>아이디 찾기</Link> */}
                   {/* <Link to={"#"}>비밀번호 찾기</Link> */}
                 </LoginLinkBox>
+                <LoginLinkBox>
+                  <Link to={"/findPassword"}>비밀번호를 잊으셨나요?</Link>
+                  {/* <Link to={"#"}>아이디 찾기</Link> */}
+                  {/* <Link to={"#"}>비밀번호 찾기</Link> */}
+                  </LoginLinkBox>
               </div>
               {/* <div className="lawyer-login">
                 <span>혹시 변리사님이신가요?</span>

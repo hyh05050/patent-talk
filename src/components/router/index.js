@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import { Storage } from "../../modules/Storage";
 import Chat from "../../pages/Chat";
+import FindPassword from "../../pages/FindPassword";
 import Home from "../../pages/Home";
 import Join from "../../pages/Join";
 import JoinAttorney from "../../pages/JoinAttorney";
@@ -24,6 +25,7 @@ const MainRouter = () => {
       <Route path="/matching/:preMatchingId" element={isLogin ? <Matching /> : <Login />} />
       <Route path="/mypage" element={isLogin ? <Mypage /> : <Login />} />
       <Route path="/chat" element={isLogin ? <Chat /> : <Login />} />
+      <Route path="/findPassword" element={<FindPassword />} />
     </Routes>
   );
 };

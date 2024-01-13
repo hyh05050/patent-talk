@@ -67,8 +67,8 @@ export const getAccountProfile = async (data) => {
   });
 }
 
-export const requestVerifyCode = async (email) => {
-  return await axios.get(BASE_URL + "/account/requestVerifyCode/" + email, {
+export const requestVerifyCode = async (email, reset?) => {
+  return await axios.get(BASE_URL + "/account/requestVerifyCode/" + email +"/" + reset, {
     headers: {
       "X-AUTH-TOKEN": Storage.get("authToken"),
     },
@@ -81,6 +81,15 @@ export const verifyCode = async (data) => {
       "X-AUTH-TOKEN": Storage.get("authToken"),
     },
   });
+}
+
+export const resetPassword = async (data) => {
+  return await axios.post(BASE_URL + "/reset/password", data, {
+    headers: {
+      "X-AUTH-TOKEN": Storage.get("authToken"),
+    },
+  });
+
 }
 
 export const getPreMatchingInfo = async (pId) => {
