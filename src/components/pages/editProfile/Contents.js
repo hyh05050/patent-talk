@@ -87,6 +87,26 @@ const Contents = () => {
     // console.log("passwordInfo : accountId : ", accountId);
     // console.log("passwordInfo currentpassword : ", passwordInfo.password);
     // console.log("passwordInfo newpassword : ", passwordInfo.newPassword);
+    if(!passwordInfo.password) {
+      setError(
+        "password",
+        {
+          message: "현재 비밀번호를 입력하세요.",
+        },
+        { shouldFocus: true }
+      );
+      return;
+    }
+    if(!passwordInfo.newPassword) {
+      setError(
+        "newPassword",
+        {
+          message: "새 비밀번호를 입력하세요.",
+        },
+        { shouldFocus: true }
+      );
+      return;
+    }
     if(passwordInfo.password === passwordInfo.newPassword) {
       setError(
         "passwordConfirm",
@@ -239,7 +259,6 @@ const Contents = () => {
                           <input type="password" className="form-control" id="password" placeholder="비밀번호를 입력하세요."
                           {
                             ...register("password", {
-                              required: "비밀번호를 입력해주세요.",
                               pattern: {
                                 value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&+-^])[A-Za-z\d@$!%*#?&+-^]{8,}$/,
                                 message: "영문, 숫자, 특수문자 조합 및 최소 8자 이상이어야 합니다.",
@@ -257,7 +276,6 @@ const Contents = () => {
                           <input type="password" className="form-control" id="newPassword" placeholder="새 비밀번호를 입력하세요."
                           {
                             ...register("newPassword", {
-                              required: "새 비밀번호를 입력해주세요.",
                               pattern: {
                                 value: /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&+-^])[A-Za-z\d@$!%*#?&+-^]{8,}$/,
                                 message: "영문, 숫자, 특수문자 조합 및 최소 8자 이상이어야 합니다.",
