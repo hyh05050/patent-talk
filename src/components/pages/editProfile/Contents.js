@@ -109,7 +109,7 @@ const Contents = () => {
     }
     if(passwordInfo.password === passwordInfo.newPassword) {
       setError(
-        "passwordConfirm",
+        "newPassword",
         {
           message: "현재 비밀번호와 새 비밀번호가 동일합니다.",
         },
