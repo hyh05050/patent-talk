@@ -19,6 +19,9 @@ export const Storage = {
 
   doRefreshAccessToken: async () => {
     const refreshToken = Storage.get("refreshToken");
+    if (!refreshToken) {
+      return false;
+    }
     return await axios.post("https://indieip.startlump.com/api/refresh", {
       refreshToken: refreshToken,
     });
@@ -27,9 +30,8 @@ export const Storage = {
   checkAccessToken: async () => {
     const accessToken = Storage.get("authToken");
     if (!accessToken) {
-      return false;
+      return -1;
     }
-
     const response = await axios.post("https://indieip.startlump.com/api/accessTokenTouch", {
       accessToken: accessToken,
     });
