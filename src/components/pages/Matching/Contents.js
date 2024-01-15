@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 import userIcon from "../../../assets/images/user.png";
 import { preMatchingSelector, useAppDispatch } from "../../../store";
-import { setAlertModal } from "../../../store/slice/modal";
+import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 import { useGetAgentListMutation, useGetQuotationListMutation } from "../../../api/preMatching";
 import { useAppSelector } from "./../../../store/index";
 import { useAddMatchingMutation } from "../../../api/preMatching";
@@ -430,6 +430,12 @@ const Contents = () => {
 
   const addMatching = () => {
     const quotationId = quotationList?.find((quotation) => quotation.agentNo === proposal.agentNo)?.quotationId;
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
+
     addMatchingAPI({
       quotationId: quotationId,
     })
@@ -456,6 +462,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 

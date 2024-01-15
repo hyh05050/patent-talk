@@ -3,9 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAppDispatch } from "../../../store";
 import { Storage } from "../../../modules/Storage";
-import { setAlertModal } from "../../../store/slice/modal";
+import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 import { useGetAccountInfoQuery, useUpdateInfoMutation, useUpdatePasswordMutation } from "../../../api/account";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 const Contents = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -20,7 +20,7 @@ const Contents = () => {
   const [updatePasswordAPI] = useUpdatePasswordMutation();
 
 
-  const { register, handleSubmit, getValues, setError, formState: { errors } } = useForm();
+  const { register, handleSubmit, getValues, setValue, setError, formState: { errors } } = useForm();
 
   useEffect(() => {
     if (!isLogin) {
@@ -37,9 +37,18 @@ const Contents = () => {
       //setUsername(Storage.get("humanName"));
       //setEmail(Storage.get("accountKey"));
       // if(accountInfo) console.log(accountInfo.data);
-      if(accountInfo?.data?.humanName)  setUsername(accountInfo.data.humanName);
-      if(accountInfo?.data?.accountKey) setEmail(accountInfo.data.accountKey);
-      if(accountInfo?.data?.phone)      setPhone(accountInfo.data.phone);
+      if(accountInfo?.data?.humanName)  {
+        setUsername(accountInfo.data.humanName);
+        setValue("humanName", accountInfo.data.humanName);
+      }
+      if(accountInfo?.data?.accountKey) {
+        setEmail(accountInfo.data.accountKey);
+        setValue("accountKey", accountInfo.data.accountKey);
+      }
+      if(accountInfo?.data?.phone) {
+        setPhone(accountInfo.data.phone);
+        setValue("phone", accountInfo.data.phone);
+      }
 
     }
   }, [accountInfo]);
@@ -50,6 +59,11 @@ const Contents = () => {
   };
 
   const updateInfo = (accountInfo) => {
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     updateInfoAPI({ accountId: accountId, accountKey: accountInfo.accountKey, phone: accountInfo.phone})
       .unwrap()
       .then(({ status, data }) => {
@@ -74,6 +88,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(() => {
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 
@@ -127,6 +147,11 @@ const Contents = () => {
       );
       return;
     }
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     updatePasswordAPI({ accountKey: passwordInfo.accountKey, password: passwordInfo.password, newPassword: passwordInfo.newPassword})
       .unwrap()
       .then(({ status, data }) => {
@@ -148,6 +173,12 @@ const Contents = () => {
             })
           );
         }
+      }).finally(() => {
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       })
   };
 

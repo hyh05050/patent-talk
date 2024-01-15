@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import Modal from "react-modal";
 import { sendQuotation } from "../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
-import { setQuotationModal } from "../../store/slice/modal";
+import { setLoadingModal, setQuotationModal } from "../../store/slice/modal";
 import { useSetQuotationMutation } from "../../api/preMatching";
 
 const QuotationModal = () => {
@@ -12,6 +12,7 @@ const QuotationModal = () => {
   const dispatch = useAppDispatch();
   const [openClass, setOpenClass] = useState(false);
   const [setQuotationApi] = useSetQuotationMutation();
+  const [offerPrice, setOfferPrice] = useState(0);
 
   useEffect(() => {
     // 모달이 열릴 때 이벤트 처리
@@ -39,6 +40,12 @@ const QuotationModal = () => {
       preMatchingId: modal?.modalData?.preMatchingId,
     };
 
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
+
     setQuotationApi(param)
       .unwrap()
       .then(({ status }) => {
@@ -46,6 +53,12 @@ const QuotationModal = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 
@@ -92,12 +105,19 @@ const QuotationModal = () => {
         </button>
       </div>
       <form onSubmit={handleSubmit(sendOffer)}>
-        <div className="modal-body">
-          <div className="modal-body__content">
-            <div className="modal-body__content__title">
+        <div >
+          <div >
+            <div>
               <h3>제안 가격</h3>
 
               <input
+                style={
+                  {
+                    paddingRight: "10px",
+                    paddingLeft: "10px",
+                    width: "100%",
+                  }
+                }
                 type="text"
                 placeholder="제안 가격을 입력하세요."
                 id="offerPrice"
@@ -105,20 +125,43 @@ const QuotationModal = () => {
                   required: true,
                   pattern: /^[0-9]*$/,
                 })}
+                onChange={(e) => {
+                  if(e.target.value === "") setOfferPrice(0);
+                  else setOfferPrice(parseInt(e.target.value));
+                }}
               />
               {errors?.offerPrice && <Warning>제안 가격을 입력하세요.</Warning>}
             </div>
+            <label style={
+                {
+                  alignContent: "flex-end",
+                  marginTop: "10px",
+                  marginBottom: "10px",
+                  fontSize: "20px",
+                  fontWeight: "bold",
+                }
+              } htmlFor="offerPrice">{offerPrice.toLocaleString()}원</label>
             <div className="modal-body__content__text">
-              <p>견적서를 확인하시겠습니까?</p>
+              <p>제안 가격을 전송 할까요?</p>
             </div>
           </div>
         </div>
 
         <div className="modal-footer">
-          <button className="modal-footer__button" onClick={closeModal}>
+          <button style={
+            {
+              marginLeft: "12px",
+              marginRight: "12px",
+            }
+          } className="modal-footer__button" onClick={closeModal}>
             취소
           </button>
-          <button className="modal-footer__button" type="submit">
+          <button style={
+            {
+              marginLeft: "12px",
+              marginRight: "12px",
+            }
+          } className="modal-footer__button" type="submit">
             확인
           </button>
         </div>

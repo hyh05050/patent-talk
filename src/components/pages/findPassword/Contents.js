@@ -3,11 +3,16 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { requestVerifyCode, resetPassword, verifyCode } from "../../../api/axiosApi";
+import LoadingModal from "../../modals/LoadingModal";
+import { useAppDispatch } from "../../../store";
+import { setLoadingModal } from "../../../store/slice/modal";
 
 const Contents = () => {
     const navigate = useNavigate();
     const [isCodeSent, setIsCodeSent] = useState(false);
     const [isEmailVerify, setIsEmailVerify] = useState(false);
+
+    const dispatch = useAppDispatch();
 
     const {
         register,
@@ -25,6 +30,12 @@ const Contents = () => {
     const requestVerifyEmail = () => {
         const emailParam = document.getElementById("email").value;
         setIsCodeSent(true);
+
+        dispatch(
+            setLoadingModal({
+                modalState: true,
+            })
+        );
         requestVerifyCode(emailParam, 1).then((res) => {
             console.log(res);
             if(res.data.status === "success") {
@@ -43,6 +54,12 @@ const Contents = () => {
             setIsCodeSent(false);
             alert("이메일 발송에 실패했습니다.");
             console.log(error);
+        }).finally(() => {
+            dispatch(
+                setLoadingModal({
+                    modalState: false,
+                })
+            );
         });
     }
 
@@ -50,6 +67,11 @@ const Contents = () => {
         console.log("confirmCode");
         const emailParam = document.getElementById("email").value;
         const codeParam = document.getElementById("email_check").value;
+        dispatch(
+            setLoadingModal({
+                modalState: true,
+            })
+        );
         verifyCode({email: emailParam, code: codeParam}).then((res) => {
             console.log(res);
             if(res.data.status === "success") {
@@ -62,11 +84,22 @@ const Contents = () => {
             }
         }).catch((error) => {
             console.log(error);
+        }).finally(() => {
+            dispatch(
+                setLoadingModal({
+                    modalState: false,
+                })
+            );
         });
     }
 
     const requestResetPassword = () => {
         const emailParam = document.getElementById("email").value;
+        dispatch(
+            setLoadingModal({
+                modalState: true,
+            })
+        );
         resetPassword({accountKey: emailParam}).then((res) => {
             console.log(res);
             if(res.data.status === "success") {
@@ -82,12 +115,19 @@ const Contents = () => {
             console.log(error);
             alert("비밀번호 재설정에 실패했습니다.\n잠시 후 다시 시도해주세요.");
             navigate("/findPassword")
-        });
+        }).finally(()=>{
+            dispatch(
+                setLoadingModal({
+                    modalState: false,
+                })
+            );
+        });;
     }
 
     return (
         <main>
             <section>
+                <LoadingModal />
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <FindPasswordPage>
                         <FindPasswordPageDiv>
@@ -111,6 +151,7 @@ const Contents = () => {
                                     />
                                     {errors?.accountKey && <WarningMessage>{errors.accountKey.message}</WarningMessage>}
                                 </FPInputBox>
+                                <FPButton type="button" onClick={requestVerifyEmail} disabled={isCodeSent}>인증번호 발송</FPButton>
                                 <FPInputBox>
                                     <label htmlFor="email_check">이메일 확인</label>
                                     <input
@@ -119,9 +160,8 @@ const Contents = () => {
                                         placeholder="인증번호를 입력하세요."
                                         disabled={isEmailVerify}
                                         />
-                                    <button type="button" onClick={requestVerifyEmail} disabled={isCodeSent}>인증번호 발송</button>
-                                    <button type="button" onClick={confirmCode} disabled={isEmailVerify}>인증번호 확인</button>
-                                    <button type="button" onClick={requestResetPassword} disabled={!isCodeSent || !isEmailVerify} >비밀번호 재설정</button>
+                                    <FPButton type="button" onClick={confirmCode} disabled={isEmailVerify}>인증번호 확인</FPButton>
+                                    <FPButton type="button" onClick={requestResetPassword} disabled={!isCodeSent || !isEmailVerify} >비밀번호 재설정</FPButton>
                                 </FPInputBox>
                             </div>
                         </FindPasswordPageDiv>
@@ -192,6 +232,7 @@ const FPInputBox = styled.div`
     flex-direction: column;
     width: 100%;
     margin-bottom: 16px;
+    margin-top : 16px;
 
     label {
         font-size: 14px;
@@ -226,6 +267,29 @@ const WarningMessage = styled.span`
     line-height: 20px;
     display: block;
     margin-top: 7px;
+`;
+
+const FPButton = styled.button`
+  font-size: 16px;
+  font-weight: 700;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #fff;
+  letter-spacing: 0px;
+  line-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  height: 52px;
+  background-color: #202d90;
+  margin-top: 12px;
+
+  &.disabled {
+    background-color: #adb5bd;
+  }
 `;
 
 export default Contents;

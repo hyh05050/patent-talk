@@ -67,7 +67,7 @@ export const getAccountProfile = async (data) => {
   });
 }
 
-export const requestVerifyCode = async (email, reset?) => {
+export const requestVerifyCode = async (email, reset) => {
   return await axios.get(BASE_URL + "/account/requestVerifyCode/" + email +"/" + reset, {
     headers: {
       "X-AUTH-TOKEN": Storage.get("authToken"),

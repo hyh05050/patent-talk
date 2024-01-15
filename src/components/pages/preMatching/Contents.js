@@ -485,7 +485,6 @@ const Contents = () => {
     preMatchingAPI(params)
       .unwrap()
       .then(({ status }) => {
-        dispatch(setLoadingModal());
         if (status === "success") {
           navigate("/mypage");
         } else {
@@ -499,6 +498,8 @@ const Contents = () => {
       })
       .catch((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(setLoadingModal());
       });
   };
 
