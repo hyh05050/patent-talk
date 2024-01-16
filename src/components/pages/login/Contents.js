@@ -7,7 +7,7 @@ import styled from "styled-components";
 import { useLoginMutation } from "../../../api/account";
 import { Storage } from "../../../modules/Storage";
 import { useAppDispatch } from "../../../store";
-import { setAlertModal } from "../../../store/slice/modal";
+import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 
 const LoginPage = styled.div`
   display: flex;
