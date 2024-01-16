@@ -6,7 +6,7 @@ import { useJoinMutation } from "../../../api/account";
 import { useGetAgentInfoMutation } from "../../../api/agent";
 import { requestVerifyCode, verifyCode } from "../../../api/axiosApi";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../../store";
-import { setAgentInformationModal, setAlertModal } from "../../../store/slice/modal";
+import { setAgentInformationModal, setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 
 const JoinPage = styled.div`
   display: flex;
@@ -264,6 +264,11 @@ const Contents = () => {
   } = useForm();
 
   const join = (accountInfo) => {
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     joinAPI({
       ...accountInfo,
       roles: "attorney",
@@ -292,6 +297,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 
@@ -330,6 +341,11 @@ const Contents = () => {
       return;
     }
     setIsCodeSent(true);
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     requestVerifyCode(emailParam, 0).then((res) => {
       if(res.data.status === "success") {
         console.log("이메일로 인증번호 발송 성공");
@@ -347,6 +363,12 @@ const Contents = () => {
       setIsCodeSent(false);
       alert("이메일로 인증번호 발송에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
       console.log(err);
+    }).finally(()=>{
+      dispatch(
+        setLoadingModal({
+          modalState: false,
+        })
+      );
     });
   }
 
@@ -354,6 +376,11 @@ const Contents = () => {
     console.log("confirmCode");
     const emailParam = getValues("accountKey");
     const codeParam = document.getElementById("email_check").value;
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     verifyCode({email: emailParam, code: codeParam}).then((res) => {
       if(res.data.status === "success") {
         console.log("코드 확인 성공");
@@ -366,6 +393,12 @@ const Contents = () => {
     }).catch((err) => {
       alert("이메일 인증에 실패하였습니다.\n잠시 후 다시 시도해주세요.");
       console.log(err);
+    }).finally(()=>{
+      dispatch(
+        setLoadingModal({
+          modalState: false,
+        })
+      );
     });
   }
 
@@ -425,6 +458,11 @@ const Contents = () => {
   };
 
   const checkByAgentName = () => {
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     agentApi(`agentName/${getValues("humanName")}`)
       .unwrap()
       .then(({ status, data: agentInfo }) => {
@@ -465,6 +503,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 
@@ -482,6 +526,11 @@ const Contents = () => {
   }, [modal?.modalData?.selectedAgent]);
 
   const checkByAgentNo = () => {
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     agentApi(`agentNo/${getValues("agentNo")}`)
       .unwrap()
       .then(({ status, data: agentInfo }) => {
@@ -536,6 +585,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 

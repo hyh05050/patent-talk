@@ -207,6 +207,11 @@ const Contents = () => {
   } = useForm();
 
   const login = (accountInfo) => {
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     loginAPI(accountInfo)
       .unwrap()
       .then(({ status, data: account, refreshToken, authToken }) => {
@@ -233,6 +238,12 @@ const Contents = () => {
       })
       .then((err) => {
         if (err) console.log(`error:${err}`);
+      }).finally(()=>{
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
       });
   };
 
