@@ -44,6 +44,9 @@ export const preMatchingApi = createApi({
     addPreMatching: builder.mutation({
       query: (payload) => httpObject("/preMatching", "POST", payload),
     }),
+    updatePreMatching: builder.mutation({
+      query: (payload) => httpObject("/preMatching", "PUT", payload),
+    }),
     addMatching: builder.mutation({
       query: (payload) => httpObject("/preMatching/selectQuotation", "POST", payload),
     }),
@@ -60,6 +63,7 @@ export const {
   useGetPreMatchingListAIDQuery,
   useGetPreMatchingQuery,
   useAddPreMatchingMutation,
+  useUpdatePreMatchingMutation,
   useGetAgentListMutation,
   useGetQuotationListMutation,
   useAddMatchingMutation,

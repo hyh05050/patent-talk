@@ -2,10 +2,11 @@ import React, { useEffect } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useGetPreMatchingQuery } from "../../api/preMatching";
+import { useGetPreMatchingQuery, useUpdatePreMatchingMutation } from "../../api/preMatching";
 import closeIcon from "../../assets/images/close.png";
+import { Storage } from "../../modules/Storage";
 import { modalSelector, useAppDispatch, useAppSelector } from "../../store";
-import { setPreMatchingModal } from "../../store/slice/modal";
+import { setLoadingModal, setPreMatchingModal } from "../../store/slice/modal";
 import { convertCodeToText as CTT } from "../pages/preMatching/Category";
 
 const ModalHeader = styled.div`
@@ -81,6 +82,9 @@ const PreMatchingModal = () => {
   const { matching: modal } = useAppSelector(modalSelector);
   const dispatch = useAppDispatch();
   const { data: matching, isLoading, refetch } = useGetPreMatchingQuery(modal.modalData?.preMatchingId || "0");
+  const [updatePreMatching] = useUpdatePreMatchingMutation();
+  const role = Storage.get("role");
+
   useEffect(() => {
     // 모달이 열릴 때 이벤트 처리
     if (modal.modalState) {
@@ -115,6 +119,26 @@ const PreMatchingModal = () => {
   const onClickAttorneyButton = () => {
     closeModal();
     navigate("/chat");
+  };
+
+  const onClickFinish = (data) => {
+    console.log("onClickFinish", data);
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
+      updatePreMatching({preMatchingId: data.preMatchingId, status: "Done"}).unwrap()
+      .then(() => {
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
+        closeModal();
+        alert("업무 완료 요청을 전송했습니다.");
+        window.location.reload();
+      })
   };
 
   if (isLoading) return <></>;
@@ -198,7 +222,7 @@ const PreMatchingModal = () => {
             <p className="contents-info">
               {matching?.data?.managerId ? (
               <a href="" onClick={() => onClickAttorneyButton(matching?.data)}>
-                매칭 완료 (변리사와 연결)
+                매칭 완료 (대화방 연결)
               </a>) : (
                 <a href="" onClick={() => onClickMatchingButton(matching?.data)}>
                   매칭 신청 완료 (견적 확인하기)
@@ -207,6 +231,17 @@ const PreMatchingModal = () => {
               }
             </p>
           </div>
+          {matching?.data?.status === "Matched" && role?.includes("attorney") && (
+            <div>
+              <p className="contents-subtitle">6. 업무 완료 요청</p>
+              <p className="contents-info">
+                <button onClick={() => onClickFinish(matching?.data)}>
+                  업무 완료 요청 하기
+                </button>
+              </p>
+            </div>
+          )
+          }
         </div>
       </ModalContents>
     </Modal>

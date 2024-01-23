@@ -357,12 +357,14 @@ const AttorneyContents = () => {
 
   if (isLoading) return <div>loading...</div>;
 
-  const displayedData =
+  var displayedData =
     matchings?.data
       ?.filter((matching) => matching.status == activeStatus)
       .slice(0)
       .reverse() || [];
-  console.log("displayedData", displayedData);
+  if(activeStatus == "Matched") {
+    displayedData = displayedData.filter((matching) => matching.managerId == myAttorneyNo);
+  }
 
   return (
     <main style={{ minHeight: "800px", background: "#e5ecef" }}>
