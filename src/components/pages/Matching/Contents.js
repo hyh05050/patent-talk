@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
+import { useAddMatchingMutation, useGetAgentListMutation, useGetQuotationListMutation } from "../../../api/preMatching";
 import userIcon from "../../../assets/images/user.png";
 import { preMatchingSelector, useAppDispatch } from "../../../store";
 import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
-import { useGetAgentListMutation, useGetQuotationListMutation } from "../../../api/preMatching";
 import { useAppSelector } from "./../../../store/index";
-import { useAddMatchingMutation } from "../../../api/preMatching";
 
 const Container = styled.div`
   max-width: 768px;
@@ -495,6 +494,10 @@ const Contents = () => {
 
     addMatching();
   };
+  var sortedList = [...agentList];
+  if( sortedList !== undefined && sortedList !== null && sortedList.length > 0)  {
+    sortedList.sort(function(a,b) { return b.priority - a.priority } );
+  }
 
   return (
     <main style={{ background: "#e5ecef" }}>
@@ -503,7 +506,7 @@ const Contents = () => {
           <FieldTitle className="animate">제안 선택</FieldTitle>
 
           <FieldBox>
-            {agentList?.map((agent, index) => (
+            {sortedList?.map((agent, index) => (
               <Field key={index} className={proposal?.agentNo === agent.agentNo && "active"}>
                 <div className="contents">
                   <div className="attorney_img">
@@ -555,7 +558,7 @@ const Contents = () => {
           </FieldBox>
 
           <CardBox>
-            {agentList.map((agent, index) => (
+            {sortedList.map((agent, index) => (
               <Card key={"matching_" + index} className={proposal?.agentNo === agent.agentNo && "active"}>
                 <div className="attorney_info">
                   <div className="attorney_img">
