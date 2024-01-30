@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { Collapse, CardBody, Card } from "./Collapse";
-import { Link } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { Storage } from "../../../modules/Storage";
+import { Card, CardBody, Collapse } from "./Collapse";
 import "./style.css";
 
 const menus = [
@@ -22,6 +22,12 @@ const menus = [
     id: 3,
     title: "마이페이지",
     link: "/mypage",
+    loginFlag: true,
+  },
+  {
+    id: 4,
+    title: "회원정보 수정",
+    link: "/mypage/modify",
     loginFlag: true,
   },
 ];

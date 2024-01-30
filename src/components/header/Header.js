@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Storage } from "../../modules/Storage";
 import HeaderLogo from "../../assets/images/header-logo.png";
+import { Storage } from "../../modules/Storage";
 import MobileMenu from "./mobile";
 
 const Header = () => {

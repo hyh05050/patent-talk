@@ -8,7 +8,7 @@ import { setAlertModal, setPreMatchingModal } from "../../../store/slice/modal";
 import { convertCodeToText as CTT } from "../preMatching/Category";
 
 const Container = styled.div`
-  padding: 120px 0;
+  padding: 40px 0;
 
   @media (max-width: 991px) {
     padding: 40px 0;
@@ -410,7 +410,7 @@ const Contents = () => {
                             <td>
                               {matching.managerId ? (
                                 <button type="button" className="download-btn" onClick={() => onClickAttorneyButton(matching.preMatchingId)}>
-                                  {matching?.managerName} 변리사
+                                  {matching?.managerName} 채팅방
                                 </button>
                               ) : (
                                 <button
@@ -428,7 +428,7 @@ const Contents = () => {
                   </MatchingTable>
 
                   <MatchingBox>
-                    {matchings.data?.map((matching, index) => (
+                    {displayedData.length != 0 ? displayedData?.map((matching, index) => (
                       <div key={"matching_" + index} className="item" onClick={(e) => onClickMatchingRow(e, matching)}>
                         <p>
                           신청일 : <span>{matching.createdAt?.substring(0, 10)}</span>
@@ -450,8 +450,8 @@ const Contents = () => {
                         <div className="button">
                           <div>
                             {matching.managerId ? (
-                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
-                                {matching?.managerName} 변리사
+                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton(matching.preMatchingId)}>
+                                {matching?.managerName} 채팅방으로 이동
                               </button>
                             ) : (
                               <button
@@ -465,7 +465,7 @@ const Contents = () => {
                           </div>
                         </div>
                       </div>
-                    ))}
+                    )) : <div className="item">조회된 내역이 없습니다.</div>}
                   </MatchingBox>
                 </MatchingContents>
               </div>

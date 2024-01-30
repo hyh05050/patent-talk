@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { useAppDispatch } from "../../../store";
-import { Storage } from "../../../modules/Storage";
-import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 import { useGetAccountInfoQuery, useUpdateInfoMutation, useUpdatePasswordMutation } from "../../../api/account";
-import { set, useForm } from "react-hook-form";
+import { Storage } from "../../../modules/Storage";
+import { useAppDispatch } from "../../../store";
+import { setAlertModal, setLoadingModal } from "../../../store/slice/modal";
 const Contents = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -347,7 +347,7 @@ const Contents = () => {
 }
 
 const Container = styled.div`
-  padding: 120px 0;
+  padding: 40px 0;
 
   @media (max-width: 991px) {
     padding: 40px 0;

@@ -11,7 +11,7 @@ import { Storage } from "../../../modules/Storage";
 import { compareDate, dateFormat, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
 import { base64String } from "../../../modules/fileEncoder";
 import { useAppDispatch } from "../../../store";
-import { setSimpleListModal } from "../../../store/slice/modal";
+import { setLoadingModal, setSimpleListModal } from "../../../store/slice/modal";
 
 // const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
 var socket ;
@@ -196,6 +196,11 @@ const Contents = () => {
 
   const uploadFile = (e) => {
     const file = e.target.files[0];
+    dispatch(
+      setLoadingModal({
+        modalState: true,
+      })
+    );
     base64String(file).then((fileString) => {
       const fileVo = {
         linkKey: currentChatRoomId,
@@ -215,7 +220,24 @@ const Contents = () => {
           };
           socket.send(JSON.stringify(message));
         }
-      });
+      }).catch((err) => {
+        console.log(err);
+        alert("파일 전송에 실패하였습니다.");
+      }).finally(() => {
+        dispatch(
+          setLoadingModal({
+            modalState: false,
+          })
+        );
+      });;
+    }).catch((err) => {
+      console.log(err);
+      alert("파일 전송에 실패하였습니다.");
+      dispatch(
+        setLoadingModal({
+          modalState: false,
+        })
+      );
     });
     
   };
@@ -416,11 +438,11 @@ const Contents = () => {
 export default Contents;
 
 const Container = styled.div`
-  padding: 120px 0;
+  padding: 40px 0;
   max-width: 1600px;
 
   @media (max-width: 991px) {
-    padding: 40px 0;
+    padding: 20px , 0;
   }
 `;
 
@@ -524,20 +546,24 @@ const ChatBox = styled.div`
 
   & > div {
     width: 100%;
-    height: 800px;
+    height: 880px;
     background-color: #fff;
   }
 `;
 
 const ChatListBox = styled.div`
   position: relative;
-  display: flex;
+  display: none;
   flex: 1;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
   background-color: transparent;
   padding: 20px;
+
+  @media (min-width: 767px) {
+    display: flex;
+  }
 
   div.searchBox {
     position: relative;
@@ -785,6 +811,7 @@ const ChatContents = styled.div`
   align-items: flex-start;
 
   width: 100%;
+  height: 100%;
   padding: 30px;
 
   height: 666px;

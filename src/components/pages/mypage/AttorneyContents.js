@@ -14,7 +14,7 @@ import {
 import { convertCodeToText as CTT } from "../preMatching/Category";
 
 const Container = styled.div`
-  padding: 120px 0;
+  padding: 40px 0;
 
   @media (max-width: 991px) {
     padding: 40px 0;
@@ -494,7 +494,7 @@ const AttorneyContents = () => {
                   </MatchingTable>
 
                   <MatchingBox>
-                    {matchings?.data?.map((matching, index) => (
+                    {displayedData?.map((matching, index) => (
                       <div key={"matching_" + index} className="item" onClick={(e) => onClickMatchingRow(e, matching)}>
                         <p>
                           신청일 : <span>{matching.createdAt?.substring(0, 10)}</span>
@@ -516,8 +516,8 @@ const AttorneyContents = () => {
                         <div className="button">
                           <div>
                             {matching.managerId ? (
-                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton()}>
-                                {matching?.managerName} 변리사
+                              <button type="button" className="download-btn" onClick={() => onClickAttorneyButton(matching.preMatchingId)}>
+                                {matching?.managerName} 채팅방
                               </button>
                             ) : (
                               <button
@@ -532,6 +532,11 @@ const AttorneyContents = () => {
                         </div>
                       </div>
                     ))}
+                    {displayedData?.length == 0 && (
+                      <div className="item">
+                        <p>조회된 내역이 없습니다.</p>
+                      </div>
+                    )}
                   </MatchingBox>
                 </MatchingContents>
               </div>
