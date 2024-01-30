@@ -7,6 +7,7 @@ import PreMatchingModal from "../modals/PreMatchingModal";
 import QuotationDetailModal from "../modals/QuotationDetailModal";
 import QuotationModal from "../modals/QuotationModal";
 import RightMenuModal from "../modals/RightMenuModal";
+import SimplelistModal from "../modals/SimpleListModal";
 import SimpleRightModal from "../modals/SimpleRightModal";
 
 const ModalProvider = () => {
@@ -20,6 +21,7 @@ const ModalProvider = () => {
       <AgentInformationModal />
       <QuotationModal />
       <QuotationDetailModal />
+      <SimplelistModal />
     </>
   );
 };

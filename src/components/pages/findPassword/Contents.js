@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { requestVerifyCode, resetPassword, verifyCode } from "../../../api/axiosApi";
-import LoadingModal from "../../modals/LoadingModal";
 import { useAppDispatch } from "../../../store";
 import { setLoadingModal } from "../../../store/slice/modal";
+import LoadingModal from "../../modals/LoadingModal";
 
 const Contents = () => {
     const navigate = useNavigate();
@@ -24,7 +24,7 @@ const Contents = () => {
     } = useForm();
     
     const onSubmit = (data) => {
-        console.log(data);
+        // console.log(data);
     }
     
     const requestVerifyEmail = () => {
@@ -37,7 +37,7 @@ const Contents = () => {
             })
         );
         requestVerifyCode(emailParam, 1).then((res) => {
-            console.log(res);
+            // console.log(res);
             if(res.data.status === "success") {
                 console.log("코드 발송 성공");
                 alert("이메일로 인증번호가 발송되었습니다.");
@@ -73,7 +73,7 @@ const Contents = () => {
             })
         );
         verifyCode({email: emailParam, code: codeParam}).then((res) => {
-            console.log(res);
+            // console.log(res);
             if(res.data.status === "success") {
                 console.log("코드 확인 성공");
                 alert("이메일 인증이 완료되었습니다.");
@@ -101,7 +101,7 @@ const Contents = () => {
             })
         );
         resetPassword({accountKey: emailParam}).then((res) => {
-            console.log(res);
+            // console.log(res);
             if(res.data.status === "success") {
                 console.log("비밀번호 재설정 성공");
                 alert("비밀번호 재설정이 완료되었습니다.\n이메일을 확인해주세요.");

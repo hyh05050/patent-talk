@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { Storage } from "../modules/Storage";
-import { BASE_URL } from "./config";
+import { BASE_URL, httpObject } from "./config";
 
 // base URL과 엔드포인트들로 서비스 정의
 // 엔드포인트는 query와 mutation으로 구분
@@ -22,12 +22,18 @@ export const chatApi = createApi({
     getChatRoomList: builder.query({
       query: (payload) => `/chat/${payload}`,
     }),
+    getchatRoomFileBox: builder.query({
+      query: (payload) => `/chat/filebox?roomId=${payload}`,
+    }),
     getChatByRoomId: builder.mutation({
       query: (payload) =>
         `/chat?chatRoomId=${payload.roomId}&listCount=${payload.listCount}&skipCount=${payload.skipCount}`,
+    }),
+    uploadFile: builder.mutation({
+      query: (payload) => httpObject("/chat/uploadFile", "POST", payload),
     }),
   }),
 });
 
 // 정의된 엔드포인트에서 자동으로 생성된 훅을 함수형 컴포넌트에서 사용하기 위해 export
-export const { useGetChatRoomListQuery, useGetChatByRoomIdMutation } = chatApi;
+export const { useGetChatRoomListQuery, useGetchatRoomFileBoxQuery, useLazyGetchatRoomFileBoxQuery, useGetChatByRoomIdMutation, useUploadFileMutation } = chatApi;

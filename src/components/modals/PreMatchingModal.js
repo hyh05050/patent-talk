@@ -122,7 +122,7 @@ const PreMatchingModal = () => {
   };
 
   const onClickFinish = (data) => {
-    console.log("onClickFinish", data);
+    // console.log("onClickFinish", data);
     dispatch(
       setLoadingModal({
         modalState: true,

@@ -3,11 +3,417 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { getAccountProfile, getPreMatchingInfo } from "../../../api/axiosApi";
-import { useGetChatByRoomIdMutation, useGetChatRoomListQuery } from "../../../api/chat";
+import { useGetChatByRoomIdMutation, useGetChatRoomListQuery, useUploadFileMutation } from "../../../api/chat";
 import fileIcon from "../../../assets/images/file.png";
+import fileboxIcon from "../../../assets/images/filebox.png";
 import userImg from "../../../assets/images/user.png";
 import { Storage } from "../../../modules/Storage";
 import { compareDate, dateFormat, timeFormat, writedAtFormat } from "../../../modules/dateFormat";
+import { base64String } from "../../../modules/fileEncoder";
+import { useAppDispatch } from "../../../store";
+import { setSimpleListModal } from "../../../store/slice/modal";
+
+// const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
+var socket ;
+var pingPong = null;;
+const Contents = () => {
+
+  const dispatch = useAppDispatch();
+
+  const location = useLocation();
+  const [userName, setUserName] = useState(Storage.get("humanName"));
+  const [email, setEmail] = useState(Storage.get("accountKey"));
+  const [searchTerm, setSearchTerm] = useState("");
+  const [socketId, setSocketId] = useState(null);
+
+  const [chats, setChats] = useState(null);
+  const inputRef = useRef(null);
+  const scrollRef = useRef(null);
+  const accountId = Storage.get("accountId");
+  const role = Storage.get("role") === "client" ? "client" : "attorney";
+  const [currentChatRoomId, setCurrentChatRoomId] = useState(null);
+  const { data: rooms, isLoading } = useGetChatRoomListQuery(
+    role === "client" ? `getChatRoomClient?clientId=${accountId}` : `getChatRoomAttorney?attorneyId=${accountId}`
+  );
+  const [chatApi] = useGetChatByRoomIdMutation();
+  const [uploadApi] = useUploadFileMutation();
+  const [targetName , setTargetName] = useState("상대방");
+  const [roomTitle, setRoomTitle] = useState("발명 제목");
+  const [roomTitles, setRoomTitles] = useState([]);
+  
+  const inputFile = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      const scrollHeight = scrollRef.current.scrollHeight;
+      scrollRef.current.scrollTop = scrollHeight;
+    }
+
+    window.scrollTo(0, 30);
+  }, [chats]);
+
+  useEffect(() => {
+    makeSession();
+
+    return () => {
+      if(pingPong) clearInterval(pingPong);
+      socket.close();
+    }
+
+  }, []);
+
+  useEffect(() => {
+    updateSocketId(currentChatRoomId, accountId, socketId);
+    if(rooms != null && rooms?.data.length > 0){
+      const targetRoom = rooms?.data?.find((room) => room.id === currentChatRoomId);
+      const preMatchingId = targetRoom?.preMatchingId;
+      if(preMatchingId == null) return;
+      getPreMatchingInfo(preMatchingId).then((res) => {
+        setRoomTitle("발명 제목 : " + res.data.data.detail);
+      });
+    }
+  }, [currentChatRoomId, socketId, accountId]);
+
+  function makeSession() {
+    if(socket?.readyState === WebSocket.OPEN) return;
+    
+    socket = new WebSocket("wss://indieip.startlump.com/socket/chat");
+    
+    
+    if(pingPong) clearInterval(pingPong); //clear privious pingPong
+    //set pingPong
+    pingPong = setInterval(() => {
+      socket.send(JSON.stringify({ "keepConnection":"ping" }));
+    }, 15000);
+    socket.onopen = () => {
+      
+    };
+    socket.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      if (data.type === "session") {
+        setSocketId(data.sessionId);
+      } else if (data.type === "chat") {
+        data.createdAt = new Date().toISOString();
+        data.id = new Date().getTime();
+        setChats((prev) => [...prev, data]);
+      } else {
+        
+      }
+    };
+    socket.onclose = () => {
+      console.log("disconnected");
+      // makeSession();
+    };
+  }
+
+  useEffect(() => {
+    if (rooms && rooms?.data.length > 0) {
+      if(location.state && location.state.preMatchingId){
+        const preMatchingId = location.state.preMatchingId;
+        const targetRoom = rooms?.data?.find((room) => room.preMatchingId === preMatchingId);
+        if(targetRoom){
+          updateSocketId(targetRoom.id, accountId, socketId);
+          onClickRoom(targetRoom.id);
+        }
+      } else {
+        updateSocketId(rooms.data[0].id, accountId, socketId);
+        onClickRoom(rooms.data[0].id);
+      }
+      
+      var titles = [];
+      rooms?.data?.map((room, index) => {
+        const preMatchingId = room.preMatchingId;
+        if(preMatchingId == null) return;
+        getPreMatchingInfo(preMatchingId).then((res) => {
+          titles[index] = res.data.data.detail;
+        });
+      });
+      setRoomTitles(titles);
+    }
+  }, [rooms]);
+
+  const onClickRoom = (roomId) => {
+    updateSocketId(roomId, accountId, socketId);
+    setCurrentChatRoomId(roomId);
+    chatApi({ roomId: roomId, listCount: 10, skipCount: 0 })
+      .unwrap()
+      .then(({ status, data: chat }) => {
+        if (status === "success") {
+          if (chat && chat.length > 0) {
+            const sortedChat = [...chat].reverse();
+            setChats(sortedChat);
+          } else {
+            setChats([]);
+          }
+        }
+      })
+      .then((err) => {
+        if (err) console.log(`error:${err}`);
+      });
+  };
+
+  const handleSend = () => {
+    if (currentChatRoomId === null) {
+      alert("채팅방을 선택해주세요.");
+      return;
+    }
+    if(inputRef.current.value === ""){
+      return;
+    }
+    const message = {
+      msgContents: inputRef.current.value,
+      chatRoomId: currentChatRoomId,
+      msgFrom: accountId,
+      role: role,
+      socketId: socketId,
+      type: "chat",
+    };
+
+
+    socket.send(JSON.stringify(message));
+
+    // Send the message
+    // socket.current.emit("send", message);
+
+    // Clear the input field
+    inputRef.current.value = "";
+  };
+
+  const handleOnkeyDown = (e) => {
+    if (e.nativeEvent.isComposing) {
+      
+      e.stopPropagation();
+    }
+    else if (e.key === "Enter") {
+      
+      handleSend();
+    }
+  };
+
+  const openFileChooser = () => {
+    inputFile.current.click();
+  };
+
+  const uploadFile = (e) => {
+    const file = e.target.files[0];
+    base64String(file).then((fileString) => {
+      const fileVo = {
+        linkKey: currentChatRoomId,
+        realName: file.name,
+        base64String : fileString,
+      }
+      uploadApi(fileVo).unwrap().then(({status, data}) => {
+        if(status === "success"){
+          const message = {
+            msgContents: `[${file.name}] 파일을 전송하였습니다.`,
+            chatRoomId: currentChatRoomId,
+            msgFrom: accountId,
+            role: role,
+            socketId: socketId,
+            type: "chat",
+            // file: file.name,
+          };
+          socket.send(JSON.stringify(message));
+        }
+      });
+    });
+    
+  };
+
+  const openFileBoxDialog = () => {
+    if (currentChatRoomId === null) {
+      alert("채팅방을 선택해주세요.");
+      return;
+    }
+    dispatch(
+      setSimpleListModal({
+        modalState: true,
+        modalData: {
+          roomId: currentChatRoomId,
+        },
+      })
+    );
+  }
+
+  const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
+    
+    if(chatRoomId === null || myAccountId === null || mySocketId === null) return;
+    const message = {
+      type: "updateSocketId",
+      chatRoomId: chatRoomId,
+      accountId: myAccountId,
+      socketId: mySocketId,
+      role: role,
+    };
+    //update chatroom name
+    // find target id
+    const targetRoom = rooms?.data?.find((room) => room.id === chatRoomId);
+    const targetId = role === "client" ? targetRoom?.attorneyId : targetRoom?.clientId;
+    getAccountProfile(targetId).then((res) => {
+      if (res.status === 200) {
+        
+        setTargetName(res.data.data.humanName);
+      }
+    });
+    socket.send(JSON.stringify(message));
+  };
+
+  if (isLoading) return <div>로딩중...</div>;
+
+  return (
+    <main style={{ background: "#e5ecef" }}>
+      <section>
+        <Container className="container">
+          <div className="row">
+            <div className="col-lg-3 col-12">
+              <UserInfo className="d-none d-lg-block">
+                <p className="user_name">{userName}</p>
+                <p className="user_email">{email}</p>
+              </UserInfo>
+
+              <MyPageMenu className="d-none d-lg-block">
+                <p className="title">마이페이지</p>
+                <ul>
+                  <li>
+                    <Link to={"/mypage"} className="active">
+                      매칭 정보
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to={"/mypage/modify"}>회원정보 수정</Link>
+                  </li>
+                  <li onClick={() => Storage.logout()}>
+                    <Link>로그아웃</Link>
+                  </li>
+                </ul>
+              </MyPageMenu>
+            </div>
+
+            <ChatBox className="col-lg-9 col-12">
+              <ChatListBox>
+                <div className="searchBox">
+                  <SearchIcon />
+                  <input
+                    type="text"
+                    placeholder="변리사 이름을 검색하세요"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+
+                <div className="chatInfo">
+                  <p>
+                    채팅 <span>{rooms?.data?.length}</span>
+                  </p>
+                </div>
+
+                <ChatList className={rooms?.data?.length > 8 ? "existScroll" : ""}>
+                  {rooms?.data?.map((room, index) => (
+                    <ChatItem key={"room_" + room.id} onClick={() => onClickRoom(room.id)}>
+                      <div className="userImg">
+                        <img src={room?.userImg ? room?.userImg : userImg} alt="변리사이미지" />
+                      </div>
+                      <div className="userInfo">
+                        <div className="title">
+                          <div className="name">{room?.userName}</div>
+                          <div className="writedAt">{writedAtFormat(room?.updatedAt)}</div>
+                        </div>
+                        <div className="contents">
+                          <div className="msg">{room?.lastMsg}</div>
+                          <div className="msg">{roomTitles[index]}</div>
+                          <div className="file">{room?.file}</div>
+                        </div>
+                      </div>
+                    </ChatItem>
+                  ))}
+                </ChatList>
+              </ChatListBox>
+
+              <ChatContentsBox>
+                <div className="title">
+                  <div className="chatPartner">
+                    <img src={userImg} alt="" />
+                    {role == "client" ?  <span>{targetName} 변리사</span> : <span>{targetName} 고객</span>}
+                  </div>
+                  <div className="fileDoc" onClick={openFileBoxDialog}>
+                    <img src={fileboxIcon} alt="file box" />
+                  </div>
+                </div>
+
+                <div className="title">
+                  <span>{roomTitle}</span>
+                </div>
+
+                <div className="contents">
+                  <ChatContents ref={scrollRef}>
+                    {chats?.map((chat, index) => {
+                      const prevChat = chats[index - 1];
+                      const prevCheck = prevChat && prevChat.msgFrom === chat.msgFrom;
+                      const isSameDate = compareDate(prevChat?.createdAt, chat.createdAt);
+                      const isSameTime =
+                        prevCheck && isSameDate && timeFormat(prevChat.createdAt) === timeFormat(chat.createdAt);
+
+                      return (
+                        <div key={"chat_" + chat.id}>
+                          {!isSameDate && <div className="date">{dateFormat(chat?.createdAt)}</div>}
+                          {chat?.msgFrom === accountId ? (
+                            <MyMessage className={isSameTime ? "minutes" : ""}>
+                              <div className="message">
+                                {!isSameTime && (
+                                  <div className="title">
+                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
+                                    <div className="name">나</div>
+                                  </div>
+                                )}
+                                <div className="contents">
+                                  <div className="msgBox">{chat?.msgContents}</div>
+                                </div>
+                              </div>
+                            </MyMessage>
+                          ) : (
+                            <YourMessage className={isSameTime ? "minutes" : ""} key={index}>
+                              <div className="userImage">
+                                {!isSameTime && <img src={chat?.userImg ? chat?.userImg : userImg} alt="" />}
+                              </div>
+                              <div className="message">
+                                {!isSameTime && (
+                                  <div className="title">
+                                    <div className="name">{chat?.userName ? chat?.userName : ""}</div>
+                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
+                                  </div>
+                                )}
+                                <div className="contents">
+                                  <div className="msgBox">{chat?.msgContents}</div>
+                                </div>
+                              </div>
+                            </YourMessage>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </ChatContents>
+                </div>
+
+                <div className="inputBox">
+                  <div className="chat">
+                    <img src={fileIcon} alt="파일 등록" onClick={()=>{openFileChooser()}}/>
+                    <input type="file" id="file" ref={inputFile} style={{display:"none"}} onChange={uploadFile}/>
+                    <input type="text" placeholder="메시지를 입력하세요" ref={inputRef} onKeyDown={handleOnkeyDown}/>
+                  </div>
+                  <div className="sendButton">
+                    <button onClick={handleSend}>보내기</button>
+                  </div>
+                </div>
+              </ChatContentsBox>
+            </ChatBox>
+          </div>
+        </Container>
+      </section>
+    </main>
+  );
+};
+
+export default Contents;
 
 const Container = styled.div`
   padding: 120px 0;
@@ -530,354 +936,3 @@ const YourMessage = styled.div`
     }
   }
 `;
-
-// const socket = new WebSocket("ws://112.175.18.230:8084/socket/chat");
-var socket ;
-var pingPong = null;;
-const Contents = () => {
-  const location = useLocation();
-  const [userName, setUserName] = useState(Storage.get("humanName"));
-  const [email, setEmail] = useState(Storage.get("accountKey"));
-  const [searchTerm, setSearchTerm] = useState("");
-  const [socketId, setSocketId] = useState(null);
-
-  const [chats, setChats] = useState(null);
-  const inputRef = useRef(null);
-  const scrollRef = useRef(null);
-  const accountId = Storage.get("accountId");
-  const role = Storage.get("role") === "client" ? "client" : "attorney";
-  const [currentChatRoomId, setCurrentChatRoomId] = useState(null);
-  const { data: rooms, isLoading } = useGetChatRoomListQuery(
-    role === "client" ? `getChatRoomClient?clientId=${accountId}` : `getChatRoomAttorney?attorneyId=${accountId}`
-  );
-  const [chatApi] = useGetChatByRoomIdMutation();
-  const [targetName , setTargetName] = useState("상대방");
-  const [roomTitle, setRoomTitle] = useState("발명 제목");
-  const [roomTitles, setRoomTitles] = useState([]);
-  
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      const scrollHeight = scrollRef.current.scrollHeight;
-      scrollRef.current.scrollTop = scrollHeight;
-    }
-
-    window.scrollTo(0, 30);
-  }, [chats]);
-
-  useEffect(() => {
-    makeSession();
-
-    return () => {
-      if(pingPong) clearInterval(pingPong);
-      socket.close();
-    }
-
-  }, []);
-
-  useEffect(() => {
-    updateSocketId(currentChatRoomId, accountId, socketId);
-    if(rooms != null && rooms?.data.length > 0){
-      const targetRoom = rooms?.data?.find((room) => room.id === currentChatRoomId);
-      const preMatchingId = targetRoom?.preMatchingId;
-      if(preMatchingId == null) return;
-      getPreMatchingInfo(preMatchingId).then((res) => {
-        setRoomTitle("발명 제목 : " + res.data.data.detail);
-      });
-    }
-  }, [currentChatRoomId, socketId, accountId]);
-
-  function makeSession() {
-    if(socket?.readyState === WebSocket.OPEN) return;
-    
-    socket = new WebSocket("wss://indieip.startlump.com/socket/chat");
-    
-    
-    if(pingPong) clearInterval(pingPong); //clear privious pingPong
-    //set pingPong
-    pingPong = setInterval(() => {
-      socket.send(JSON.stringify({ "keepConnection":"ping" }));
-    }, 15000);
-    socket.onopen = () => {
-      
-    };
-    socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === "session") {
-        setSocketId(data.sessionId);
-      } else if (data.type === "chat") {
-        data.createdAt = new Date().toISOString();
-        data.id = new Date().getTime();
-        setChats((prev) => [...prev, data]);
-      } else {
-        
-      }
-    };
-    socket.onclose = () => {
-      console.log("disconnected");
-      // makeSession();
-    };
-  }
-
-  useEffect(() => {
-    if (rooms && rooms?.data.length > 0) {
-      if(location.state && location.state.preMatchingId){
-        const preMatchingId = location.state.preMatchingId;
-        const targetRoom = rooms?.data?.find((room) => room.preMatchingId === preMatchingId);
-        if(targetRoom){
-          updateSocketId(targetRoom.id, accountId, socketId);
-          onClickRoom(targetRoom.id);
-        }
-      } else {
-        updateSocketId(rooms.data[0].id, accountId, socketId);
-        onClickRoom(rooms.data[0].id);
-      }
-      
-      var titles = [];
-      rooms?.data?.map((room, index) => {
-        const preMatchingId = room.preMatchingId;
-        if(preMatchingId == null) return;
-        getPreMatchingInfo(preMatchingId).then((res) => {
-          titles[index] = res.data.data.detail;
-        });
-      });
-      setRoomTitles(titles);
-    }
-  }, [rooms]);
-
-  const onClickRoom = (roomId) => {
-    updateSocketId(roomId, accountId, socketId);
-    setCurrentChatRoomId(roomId);
-    chatApi({ roomId: roomId, listCount: 10, skipCount: 0 })
-      .unwrap()
-      .then(({ status, data: chat }) => {
-        if (status === "success") {
-          if (chat && chat.length > 0) {
-            const sortedChat = [...chat].reverse();
-            setChats(sortedChat);
-          } else {
-            setChats([]);
-          }
-        }
-      })
-      .then((err) => {
-        if (err) console.log(`error:${err}`);
-      });
-  };
-
-  const handleSend = () => {
-    if (currentChatRoomId === null) {
-      alert("채팅방을 선택해주세요.");
-      return;
-    }
-    if(inputRef.current.value === ""){
-      return;
-    }
-    const message = {
-      msgContents: inputRef.current.value,
-      chatRoomId: currentChatRoomId,
-      msgFrom: accountId, //for test
-      role: role,
-      socketId: socketId,
-      type: "chat",
-    };
-
-
-    socket.send(JSON.stringify(message));
-
-    // Send the message
-    // socket.current.emit("send", message);
-
-    // Clear the input field
-    inputRef.current.value = "";
-  };
-
-  const handleOnkeyDown = (e) => {
-    if (e.nativeEvent.isComposing) {
-      
-      e.stopPropagation();
-    }
-    else if (e.key === "Enter") {
-      
-      handleSend();
-    }
-  };
-
-  const updateSocketId = (chatRoomId, myAccountId, mySocketId) => {
-    
-    if(chatRoomId === null || myAccountId === null || mySocketId === null) return;
-    const message = {
-      type: "updateSocketId",
-      chatRoomId: chatRoomId,
-      accountId: myAccountId,
-      socketId: mySocketId,
-      role: role,
-    };
-    //update chatroom name
-    // find target id
-    const targetRoom = rooms?.data?.find((room) => room.id === chatRoomId);
-    const targetId = role === "client" ? targetRoom?.attorneyId : targetRoom?.clientId;
-    getAccountProfile(targetId).then((res) => {
-      if (res.status === 200) {
-        
-        setTargetName(res.data.data.humanName);
-      }
-    });
-    socket.send(JSON.stringify(message));
-  };
-
-  if (isLoading) return <div>로딩중...</div>;
-
-  return (
-    <main style={{ background: "#e5ecef" }}>
-      <section>
-        <Container className="container">
-          <div className="row">
-            <div className="col-lg-3 col-12">
-              <UserInfo className="d-none d-lg-block">
-                <p className="user_name">{userName}</p>
-                <p className="user_email">{email}</p>
-              </UserInfo>
-
-              <MyPageMenu className="d-none d-lg-block">
-                <p className="title">마이페이지</p>
-                <ul>
-                  <li>
-                    <Link to={"/mypage"} className="active">
-                      매칭 정보
-                    </Link>
-                  </li>
-                  <li>
-                    <Link to={"/mypage/modify"}>회원정보 수정</Link>
-                  </li>
-                  <li onClick={() => Storage.logout()}>
-                    <Link>로그아웃</Link>
-                  </li>
-                </ul>
-              </MyPageMenu>
-            </div>
-
-            <ChatBox className="col-lg-9 col-12">
-              <ChatListBox>
-                <div className="searchBox">
-                  <SearchIcon />
-                  <input
-                    type="text"
-                    placeholder="변리사 이름을 검색하세요"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div className="chatInfo">
-                  <p>
-                    채팅 <span>{rooms?.data?.length}</span>
-                  </p>
-                </div>
-
-                <ChatList className={rooms?.data?.length > 8 ? "existScroll" : ""}>
-                  {rooms?.data?.map((room, index) => (
-                    <ChatItem key={"room_" + room.id} onClick={() => onClickRoom(room.id)}>
-                      <div className="userImg">
-                        <img src={room?.userImg ? room?.userImg : userImg} alt="변리사이미지" />
-                      </div>
-                      <div className="userInfo">
-                        <div className="title">
-                          <div className="name">{room?.userName}</div>
-                          <div className="writedAt">{writedAtFormat(room?.updatedAt)}</div>
-                        </div>
-                        <div className="contents">
-                          <div className="msg">{room?.lastMsg}</div>
-                          <div className="msg">{roomTitles[index]}</div>
-                          <div className="file">{room?.file}</div>
-                        </div>
-                      </div>
-                    </ChatItem>
-                  ))}
-                </ChatList>
-              </ChatListBox>
-
-              <ChatContentsBox>
-                <div className="title">
-                  <div className="chatPartner">
-                    <img src={userImg} alt="" />
-                    {role == "client" ?  <span>{targetName} 변리사</span> : <span>{targetName} 고객</span>}
-                  </div>
-                  <div className="fileDoc">
-                    <img src={userImg} alt="" />
-                  </div>
-                </div>
-
-                <div className="title">
-                  <span>{roomTitle}</span>
-                </div>
-
-                <div className="contents">
-                  <ChatContents ref={scrollRef}>
-                    {chats?.map((chat, index) => {
-                      const prevChat = chats[index - 1];
-                      const prevCheck = prevChat && prevChat.msgFrom === chat.msgFrom;
-                      const isSameDate = compareDate(prevChat?.createdAt, chat.createdAt);
-                      const isSameTime =
-                        prevCheck && isSameDate && timeFormat(prevChat.createdAt) === timeFormat(chat.createdAt);
-
-                      return (
-                        <div key={"chat_" + chat.id}>
-                          {!isSameDate && <div className="date">{dateFormat(chat?.createdAt)}</div>}
-                          {chat?.msgFrom === accountId ? (
-                            <MyMessage className={isSameTime ? "minutes" : ""}>
-                              <div className="message">
-                                {!isSameTime && (
-                                  <div className="title">
-                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
-                                    <div className="name">나</div>
-                                  </div>
-                                )}
-                                <div className="contents">
-                                  <div className="msgBox">{chat?.msgContents}</div>
-                                </div>
-                              </div>
-                            </MyMessage>
-                          ) : (
-                            <YourMessage className={isSameTime ? "minutes" : ""} key={index}>
-                              <div className="userImage">
-                                {!isSameTime && <img src={chat?.userImg ? chat?.userImg : userImg} alt="" />}
-                              </div>
-                              <div className="message">
-                                {!isSameTime && (
-                                  <div className="title">
-                                    <div className="name">{chat?.userName ? chat?.userName : ""}</div>
-                                    <div className="writedAt">{timeFormat(chat?.createdAt)}</div>
-                                  </div>
-                                )}
-                                <div className="contents">
-                                  <div className="msgBox">{chat?.msgContents}</div>
-                                </div>
-                              </div>
-                            </YourMessage>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </ChatContents>
-                </div>
-
-                <div className="inputBox">
-                  <div className="chat">
-                    <img src={fileIcon} alt="파일 등록" />
-                    <input type="text" placeholder="메시지를 입력하세요" ref={inputRef} onKeyDown={handleOnkeyDown}/>
-                  </div>
-                  <div className="sendButton">
-                    <button onClick={handleSend}>보내기</button>
-                  </div>
-                </div>
-              </ChatContentsBox>
-            </ChatBox>
-          </div>
-        </Container>
-      </section>
-    </main>
-  );
-};
-
-export default Contents;

@@ -380,7 +380,7 @@ const Contents = () => {
 
   const confirmCode = () => {
     console.log("confirmCode");
-    console.log(document.getElementById("email_check").value);
+    // console.log(document.getElementById("email_check").value);
     const emailParam = document.getElementById("email").value;
     const codeParam = document.getElementById("email_check").value;
     dispatch(
